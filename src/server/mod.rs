@@ -88,8 +88,11 @@ impl Object {
         }
     }
 
-    pub fn as_dispatcher<D: Dispatcher>(&self) -> Result<&D> {
-        self.dispatcher.downcast_ref().ok_or(Error::Internal)
+    pub fn as_dispatcher<D: Dispatcher>(&self) -> Result<Arc<D>> {
+        self.dispatcher
+            .clone()
+            .downcast_arc::<D>()
+            .map_err(|_| Error::Internal)
     }
 
     async fn dispatch(&self, client: &mut Client, message: &mut Message) -> Result<()> {
