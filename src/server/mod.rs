@@ -50,11 +50,11 @@ impl Client {
     }
 
     pub fn get_object(&mut self, id: &ObjectId) -> Option<Object> {
-        self.store.get(object)
+        self.store.get(id)
     }
 
     pub(crate) fn remove(&mut self, id: &ObjectId) {
-        self.store.remove(object)
+        self.store.remove(id);
     }
 
     pub async fn handle_message(&mut self, message: &mut Message) -> Result<()> {
@@ -117,7 +117,7 @@ impl Store {
     }
 
     fn remove(&mut self, id: &ObjectId) {
-        self.objects.remove(id)
+        self.objects.remove(id);
     }
 }
 
