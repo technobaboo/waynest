@@ -49,7 +49,7 @@ impl Client {
         self.store.insert(object)
     }
 
-    pub fn get_object(&mut self, id: &ObjectId) -> Option<Object> {
+    pub fn get_object(&self, id: &ObjectId) -> Option<Object> {
         self.store.get(id)
     }
 
