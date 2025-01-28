@@ -15,6 +15,7 @@ repository = "https://github.com/verdiwm/waynest"
 include = ["src/**/*.rs", "README.md", "LICENSE"]
 
 [features]
+default = ["server", "stable"]
 client = []
 server = []
 
@@ -30,7 +31,7 @@ frog = []
 ivi = []
 hyprland = []
 
-# Internal features     
+# Internal features
 fuzz = ["dep:arbitrary"]
 
 [dependencies]

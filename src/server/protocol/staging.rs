@@ -1053,22 +1053,18 @@ pub mod drm_lease_v1 {
             #[doc = "The purpose of this event is to give the client the ability to"]
             #[doc = "query DRM and discover information which may help them pick the"]
             #[doc = "appropriate DRM device or select the appropriate connectors therein."]
-            async fn drm_fd(
+            fn drm_fd(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 fd: rustix::fd::OwnedFd,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_drm_lease_device_v1#{}.drm_fd({})",
                     object.id,
                     fd.as_raw_fd()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_fd(fd).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The compositor will use this event to advertise connectors available for"]
             #[doc = "lease by clients. This object may be passed into a lease request to"]
@@ -1080,20 +1076,16 @@ pub mod drm_lease_v1 {
             #[doc = "The compositor must send the drm_fd event before sending connectors."]
             #[doc = "After the drm_fd event it will send all available connectors but may"]
             #[doc = "send additional connectors at any time."]
-            async fn connector(
+            fn connector(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_device_v1#{}.connector({})", object.id, id);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_device_v1#{}.connector({})", object.id, id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The compositor will send this event to indicate that it has sent all"]
             #[doc = "currently available connectors after the client binds to the global or"]
@@ -1101,34 +1093,20 @@ pub mod drm_lease_v1 {
             #[doc = "change or when a leased connector becomes available again. It will"]
             #[doc = "similarly send this event to group wp_drm_lease_connector_v1.withdrawn"]
             #[doc = "events of connectors of this device."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_device_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_device_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is sent in response to the release request and indicates"]
             #[doc = "that the compositor is done sending connector events."]
             #[doc = "The compositor will destroy this object immediately after sending the"]
             #[doc = "event and it will become invalid. The client should release any"]
             #[doc = "resources associated with this device after receiving this event."]
-            async fn released(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_device_v1#{}.released()", object.id,);
+            fn released(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_device_v1#{}.released()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -1188,13 +1166,8 @@ pub mod drm_lease_v1 {
             #[doc = "If the compositor supports wl_output version 4 and this connector"]
             #[doc = "corresponds to a wl_output, the compositor should use the same name as"]
             #[doc = "for the wl_output."]
-            async fn name(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn name(&self, object: &crate::server::Object, name: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_drm_lease_connector_v1#{}.name(\"{}\")",
                     object.id,
                     name
@@ -1202,22 +1175,18 @@ pub mod drm_lease_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The compositor sends this event once the connector is created to provide"]
             #[doc = "a human-readable description for this connector, which may be presented"]
             #[doc = "to the user. The compositor may send this event multiple times over the"]
             #[doc = "lifetime of this object to reflect changes in the description."]
-            async fn description(
+            fn description(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 description: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_drm_lease_connector_v1#{}.description(\"{}\")",
                     object.id,
                     description
@@ -1225,22 +1194,18 @@ pub mod drm_lease_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(description))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The compositor sends this event once the connector is created to"]
             #[doc = "indicate the DRM object ID which represents the underlying connector"]
             #[doc = "that is being offered. Note that the final lease may include additional"]
             #[doc = "object IDs, such as CRTCs and planes."]
-            async fn connector_id(
+            fn connector_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 connector_id: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_drm_lease_connector_v1#{}.connector_id({})",
                     object.id,
                     connector_id
@@ -1248,25 +1213,15 @@ pub mod drm_lease_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(connector_id)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is sent after all properties of a connector have been sent."]
             #[doc = "This allows changes to the properties to be seen as atomic even if they"]
             #[doc = "happen via multiple events."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_connector_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_connector_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "Sent to indicate that the compositor will no longer honor requests for"]
             #[doc = "DRM leases which include this connector. The client may still issue a"]
@@ -1279,17 +1234,10 @@ pub mod drm_lease_v1 {
             #[doc = "If a client holds a lease for the connector, the status of the lease"]
             #[doc = "remains the same. The client should destroy the object after receiving"]
             #[doc = "this event."]
-            async fn withdrawn(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_connector_v1#{}.withdrawn()", object.id,);
+            fn withdrawn(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_connector_v1#{}.withdrawn()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
         }
     }
@@ -1462,22 +1410,18 @@ pub mod drm_lease_v1 {
             #[doc = ""]
             #[doc = "The compositor will send this event at most once during this objects"]
             #[doc = "lifetime."]
-            async fn lease_fd(
+            fn lease_fd(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 leased_fd: rustix::fd::OwnedFd,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_drm_lease_v1#{}.lease_fd({})",
                     object.id,
                     leased_fd.as_raw_fd()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_fd(leased_fd).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The compositor uses this event to either reject a lease request, or if"]
             #[doc = "it previously sent a lease_fd, to notify the client that the lease has"]
@@ -1489,17 +1433,10 @@ pub mod drm_lease_v1 {
             #[doc = "compositor loses DRM master. Compositors may advertise the connector"]
             #[doc = "for leasing again, if the resource is available, by sending the"]
             #[doc = "connector event through the wp_drm_lease_device_v1 interface."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_drm_lease_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_drm_lease_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -1723,13 +1660,12 @@ pub mod ext_data_control_v1 {
             #[doc = "ext_data_control_device.data_offer event, the new data_offer object"]
             #[doc = "will send out ext_data_control_offer.offer events to describe the MIME"]
             #[doc = "types it offers."]
-            async fn data_offer(
+            fn data_offer(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_data_control_device_v1#{}.data_offer({})",
                     object.id,
                     id
@@ -1737,10 +1673,7 @@ pub mod ext_data_control_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The selection event is sent out to notify the client of a new"]
             #[doc = "ext_data_control_offer for the selection for this device. The"]
@@ -1755,36 +1688,25 @@ pub mod ext_data_control_v1 {
             #[doc = ""]
             #[doc = "The first selection event is sent upon binding the"]
             #[doc = "ext_data_control_device object."]
-            async fn selection(
+            fn selection(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: Option<crate::wire::ObjectId>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_data_control_device_v1#{}.selection({})",
                     object.id,
                     id.as_ref().map_or("null".to_string(), |v| v.to_string())
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_object(id).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This data control object is no longer valid and should be destroyed by"]
             #[doc = "the client."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_data_control_device_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_data_control_device_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "The primary_selection event is sent out to notify the client of a new"]
             #[doc = "ext_data_control_offer for the primary selection for this device. The"]
@@ -1801,22 +1723,18 @@ pub mod ext_data_control_v1 {
             #[doc = "If the compositor supports primary selection, the first"]
             #[doc = "primary_selection event is sent upon binding the"]
             #[doc = "ext_data_control_device object."]
-            async fn primary_selection(
+            fn primary_selection(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: Option<crate::wire::ObjectId>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_data_control_device_v1#{}.primary_selection({})",
                     object.id,
                     id.as_ref().map_or("null".to_string(), |v| v.to_string())
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_object(id).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -1907,14 +1825,13 @@ pub mod ext_data_control_v1 {
             ) -> crate::server::Result<()>;
             #[doc = "Request for data from the client. Send the data as the specified MIME"]
             #[doc = "type over the passed file descriptor, then close it."]
-            async fn send(
+            fn send(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 mime_type: String,
                 fd: rustix::fd::OwnedFd,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_data_control_source_v1#{}.send(\"{}\", {})",
                     object.id,
                     mime_type,
@@ -1924,26 +1841,16 @@ pub mod ext_data_control_v1 {
                     .put_string(Some(mime_type))
                     .put_fd(fd)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This data source is no longer valid. The data source has been replaced"]
             #[doc = "by another data source."]
             #[doc = ""]
             #[doc = "The client should clean up and destroy this data source."]
-            async fn cancelled(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_data_control_source_v1#{}.cancelled()", object.id,);
+            fn cancelled(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_data_control_source_v1#{}.cancelled()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -2021,13 +1928,12 @@ pub mod ext_data_control_v1 {
             ) -> crate::server::Result<()>;
             #[doc = "Sent immediately after creating the ext_data_control_offer object."]
             #[doc = "One event per offered MIME type."]
-            async fn offer(
+            fn offer(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 mime_type: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_data_control_offer_v1#{}.offer(\"{}\")",
                     object.id,
                     mime_type
@@ -2035,10 +1941,7 @@ pub mod ext_data_control_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(mime_type))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -2149,13 +2052,12 @@ pub mod ext_foreign_toplevel_list_v1 {
             #[doc = "ext_foreign_toplevel_handle_v1. The compositor will use the"]
             #[doc = "ext_foreign_toplevel_handle_v1.done event to indicate when all data has"]
             #[doc = "been sent."]
-            async fn toplevel(
+            fn toplevel(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 toplevel: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_foreign_toplevel_list_v1#{}.toplevel({})",
                     object.id,
                     toplevel
@@ -2163,27 +2065,17 @@ pub mod ext_foreign_toplevel_list_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(toplevel))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event indicates that the compositor is done sending events"]
             #[doc = "to this object. The client should destroy the object."]
             #[doc = "See ext_foreign_toplevel_list_v1.destroy for more information."]
             #[doc = ""]
             #[doc = "The compositor must not send any more toplevel events after this event."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_foreign_toplevel_list_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_foreign_toplevel_list_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -2244,17 +2136,10 @@ pub mod ext_foreign_toplevel_list_v1 {
             #[doc = ""]
             #[doc = "Other protocols which extend the ext_foreign_toplevel_handle_v1"]
             #[doc = "interface must also ignore requests other than destructors."]
-            async fn closed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_foreign_toplevel_handle_v1#{}.closed()", object.id,);
+            fn closed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_foreign_toplevel_handle_v1#{}.closed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent after all changes in the toplevel state have"]
             #[doc = "been sent."]
@@ -2266,29 +2151,17 @@ pub mod ext_foreign_toplevel_list_v1 {
             #[doc = ""]
             #[doc = "This event must not be sent after the ext_foreign_toplevel_handle_v1.closed"]
             #[doc = "event."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_foreign_toplevel_handle_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_foreign_toplevel_handle_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The title of the toplevel has changed."]
             #[doc = ""]
             #[doc = "The configured state must not be applied immediately. See"]
             #[doc = "ext_foreign_toplevel_handle_v1.done for details."]
-            async fn title(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                title: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn title(&self, object: &crate::server::Object, title: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_foreign_toplevel_handle_v1#{}.title(\"{}\")",
                     object.id,
                     title
@@ -2296,22 +2169,18 @@ pub mod ext_foreign_toplevel_list_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(title))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "The app id of the toplevel has changed."]
             #[doc = ""]
             #[doc = "The configured state must not be applied immediately. See"]
             #[doc = "ext_foreign_toplevel_handle_v1.done for details."]
-            async fn app_id(
+            fn app_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 app_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_foreign_toplevel_handle_v1#{}.app_id(\"{}\")",
                     object.id,
                     app_id
@@ -2319,10 +2188,7 @@ pub mod ext_foreign_toplevel_list_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(app_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This identifier is used to check if two or more toplevel handles belong"]
             #[doc = "to the same toplevel."]
@@ -2344,13 +2210,12 @@ pub mod ext_foreign_toplevel_list_v1 {
             #[doc = "compositor includes an opaque generation value in identifiers. How the"]
             #[doc = "generation value is used when generating the identifier is implementation"]
             #[doc = "dependent."]
-            async fn identifier(
+            fn identifier(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 identifier: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_foreign_toplevel_handle_v1#{}.identifier(\"{}\")",
                     object.id,
                     identifier
@@ -2358,10 +2223,7 @@ pub mod ext_foreign_toplevel_list_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(identifier))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
         }
     }
@@ -2503,34 +2365,20 @@ pub mod ext_idle_notify_v1 {
             #[doc = ""]
             #[doc = "It's a compositor protocol error to send this event twice without a"]
             #[doc = "resumed event in-between."]
-            async fn idled(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_idle_notification_v1#{}.idled()", object.id,);
+            fn idled(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_idle_notification_v1#{}.idled()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent when the notification object stops being idle."]
             #[doc = ""]
             #[doc = "It's a compositor protocol error to send this event twice without an"]
             #[doc = "idled event in-between. It's a compositor protocol error to send this"]
             #[doc = "event prior to any idled event."]
-            async fn resumed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_idle_notification_v1#{}.resumed()", object.id,);
+            fn resumed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_idle_notification_v1#{}.resumed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -2994,14 +2842,13 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "Provides the dimensions of the source image in buffer pixel coordinates."]
             #[doc = ""]
             #[doc = "The client must attach buffers that match this size."]
-            async fn buffer_size(
+            fn buffer_size(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_session_v1#{}.buffer_size({}, {})",
                     object.id,
                     width,
@@ -3011,22 +2858,18 @@ pub mod ext_image_copy_capture_v1 {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Provides the format that must be used for shared-memory buffers."]
             #[doc = ""]
             #[doc = "This event may be emitted multiple times, in which case the client may"]
             #[doc = "choose any given format."]
-            async fn shm_format(
+            fn shm_format(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: super::super::super::core::wayland::wl_shm::Format,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_session_v1#{}.shm_format({})",
                     object.id,
                     format
@@ -3034,10 +2877,7 @@ pub mod ext_image_copy_capture_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(format as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event advertises the device buffers must be allocated on for"]
             #[doc = "dma-buf buffers."]
@@ -3046,22 +2886,18 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "render) is unspecified. Clients must not rely on the compositor sending"]
             #[doc = "a particular node type. Clients cannot check two devices for equality"]
             #[doc = "by comparing the dev_t value."]
-            async fn dmabuf_device(
+            fn dmabuf_device(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 device: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_session_v1#{}.dmabuf_device(array[{}])",
                     object.id,
                     device.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(device).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Provides the format that must be used for dma-buf buffers."]
             #[doc = ""]
@@ -3070,14 +2906,13 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = ""]
             #[doc = "This event may be emitted multiple times, in which case the client may"]
             #[doc = "choose any given format."]
-            async fn dmabuf_format(
+            fn dmabuf_format(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: u32,
                 modifiers: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_session_v1#{}.dmabuf_format({}, array[{}])",
                     object.id,
                     format,
@@ -3087,10 +2922,7 @@ pub mod ext_image_copy_capture_v1 {
                     .put_uint(format)
                     .put_array(modifiers)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is sent once when all buffer constraint events have been"]
             #[doc = "sent."]
@@ -3098,17 +2930,10 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "The compositor must always end a batch of buffer constraint events with"]
             #[doc = "this event, regardless of whether it sends the initial constraints or"]
             #[doc = "an update."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_image_copy_capture_session_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_image_copy_capture_session_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event indicates that the capture session has stopped and is no"]
             #[doc = "longer available. This can happen in a number of cases, e.g. when the"]
@@ -3116,20 +2941,13 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "capture, or if an unrecoverable runtime error has occurred."]
             #[doc = ""]
             #[doc = "The client should destroy the session after receiving this event."]
-            async fn stopped(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn stopped(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_session_v1#{}.stopped()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -3327,13 +3145,12 @@ pub mod ext_image_copy_capture_v1 {
             ) -> crate::server::Result<()>;
             #[doc = "This event is sent before the ready event and holds the transform that"]
             #[doc = "the compositor has applied to the buffer contents."]
-            async fn transform(
+            fn transform(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 transform: super::super::super::core::wayland::wl_output::Transform,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_frame_v1#{}.transform({})",
                     object.id,
                     transform
@@ -3341,10 +3158,7 @@ pub mod ext_image_copy_capture_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(transform as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent before the ready event. It may be generated multiple"]
             #[doc = "times to describe a region."]
@@ -3354,16 +3168,15 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "have changed since the last ready event."]
             #[doc = ""]
             #[doc = "These coordinates originate in the upper left corner of the buffer."]
-            async fn damage(
+            fn damage(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_frame_v1#{}.damage({}, {}, {}, {})",
                     object.id,
                     x,
@@ -3377,10 +3190,7 @@ pub mod ext_image_copy_capture_v1 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event indicates the time at which the frame is presented to the"]
             #[doc = "output in system monotonic time. This event is sent before the ready"]
@@ -3391,15 +3201,14 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "tv_sec which is a 64-bit value combined from tv_sec_hi and tv_sec_lo,"]
             #[doc = "and the additional fractional part in tv_nsec as nanoseconds. Hence,"]
             #[doc = "for valid timestamps tv_nsec must be in [0, 999999999]."]
-            async fn presentation_time(
+            fn presentation_time(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_frame_v1#{}.presentation_time({}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -3411,10 +3220,7 @@ pub mod ext_image_copy_capture_v1 {
                     .put_uint(tv_sec_lo)
                     .put_uint(tv_nsec)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Called as soon as the frame is copied, indicating it is available"]
             #[doc = "for reading."]
@@ -3422,28 +3228,20 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "The buffer may be re-used by the client after this event."]
             #[doc = ""]
             #[doc = "After receiving this event, the client must destroy the object."]
-            async fn ready(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_image_copy_capture_frame_v1#{}.ready()", object.id,);
+            fn ready(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_image_copy_capture_frame_v1#{}.ready()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted frame copy has failed."]
             #[doc = ""]
             #[doc = "After receiving this event, the client must destroy the object."]
-            async fn failed(
+            fn failed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 reason: FailureReason,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_frame_v1#{}.failed({})",
                     object.id,
                     reason
@@ -3451,10 +3249,7 @@ pub mod ext_image_copy_capture_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(reason as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
         }
     }
@@ -3557,38 +3352,24 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "The cursor enters the captured area when the cursor image intersects"]
             #[doc = "with the captured area. Note, this is different from e.g."]
             #[doc = "wl_pointer.enter."]
-            async fn enter(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn enter(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_cursor_session_v1#{}.enter()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent when a cursor leaves the captured area. No \"position\" or \"hotspot\""]
             #[doc = "event is generated for the cursor until the cursor enters the captured"]
             #[doc = "area again."]
-            async fn leave(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn leave(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_cursor_session_v1#{}.leave()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Cursors outside the image capture source do not get captured and no"]
             #[doc = "event will be generated for them."]
@@ -3597,14 +3378,13 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "relative to the main buffer's top left corner in transformed buffer"]
             #[doc = "pixel coordinates. The coordinates may be negative or greater than the"]
             #[doc = "main buffer size."]
-            async fn position(
+            fn position(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_cursor_session_v1#{}.position({}, {})",
                     object.id,
                     x,
@@ -3614,10 +3394,7 @@ pub mod ext_image_copy_capture_v1 {
                     .put_int(x)
                     .put_int(y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "The hotspot describes the offset between the cursor image and the"]
             #[doc = "position of the input device."]
@@ -3629,14 +3406,13 @@ pub mod ext_image_copy_capture_v1 {
             #[doc = "effective when the next ext_image_copy_capture_frame_v1.ready event is received."]
             #[doc = ""]
             #[doc = "Compositors may delay this event until the client captures a new frame."]
-            async fn hotspot(
+            fn hotspot(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_image_copy_capture_cursor_session_v1#{}.hotspot({}, {})",
                     object.id,
                     x,
@@ -3646,10 +3422,7 @@ pub mod ext_image_copy_capture_v1 {
                     .put_int(x)
                     .put_int(y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -3946,17 +3719,10 @@ pub mod ext_session_lock_v1 {
             #[doc = ""]
             #[doc = "If this event is sent, making the destroy request is a protocol error,"]
             #[doc = "the lock object must be destroyed using the unlock_and_destroy request."]
-            async fn locked(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_session_lock_v1#{}.locked()", object.id,);
+            fn locked(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_session_lock_v1#{}.locked()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The compositor has decided that the session lock should be destroyed"]
             #[doc = "as it will no longer be used by the compositor. Exactly when this"]
@@ -3980,17 +3746,10 @@ pub mod ext_session_lock_v1 {
             #[doc = "Upon receiving this event, the client should make either the destroy"]
             #[doc = "request or the unlock_and_destroy request, depending on whether or"]
             #[doc = "not the locked event was received on this object."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_session_lock_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_session_lock_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -4130,15 +3889,14 @@ pub mod ext_session_lock_v1 {
             #[doc = "The width and height are in surface-local coordinates and are exact"]
             #[doc = "requirements. Failing to match these surface dimensions in the next"]
             #[doc = "commit after acking a configure is a protocol error."]
-            async fn configure(
+            fn configure(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_session_lock_surface_v1#{}.configure({}, {}, {})",
                     object.id,
                     serial,
@@ -4150,10 +3908,7 @@ pub mod ext_session_lock_v1 {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -4290,13 +4045,12 @@ pub mod ext_transient_seat_v1 {
             #[doc = "It is sent exactly once, immediately after the transient seat is created"]
             #[doc = "and the new \"wl_seat\" global is advertised, if and only if the creation"]
             #[doc = "of the transient seat was allowed."]
-            async fn ready(
+            fn ready(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 global_name: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_transient_seat_v1#{}.ready({})",
                     object.id,
                     global_name
@@ -4304,10 +4058,7 @@ pub mod ext_transient_seat_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(global_name)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The event informs the client that the compositor denied its request to"]
             #[doc = "create a transient seat."]
@@ -4316,17 +4067,10 @@ pub mod ext_transient_seat_v1 {
             #[doc = "created, if and only if the creation of the transient seat was denied."]
             #[doc = ""]
             #[doc = "After receiving this event, the client should destroy the object."]
-            async fn denied(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_transient_seat_v1#{}.denied()", object.id,);
+            fn denied(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_transient_seat_v1#{}.denied()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -4417,13 +4161,12 @@ pub mod ext_workspace_v1 {
             #[doc = "All initial details of the workspace group (outputs) will be"]
             #[doc = "sent immediately after this event via the corresponding events in"]
             #[doc = "ext_workspace_group_handle_v1 and ext_workspace_handle_v1."]
-            async fn workspace_group(
+            fn workspace_group(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace_group: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_manager_v1#{}.workspace_group({})",
                     object.id,
                     workspace_group
@@ -4431,10 +4174,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace_group))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is emitted whenever a new workspace has been created."]
             #[doc = ""]
@@ -4443,13 +4183,12 @@ pub mod ext_workspace_v1 {
             #[doc = "ext_workspace_handle_v1."]
             #[doc = ""]
             #[doc = "Workspaces start off unassigned to any workspace group."]
-            async fn workspace(
+            fn workspace(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_manager_v1#{}.workspace({})",
                     object.id,
                     workspace
@@ -4457,10 +4196,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is sent after all changes in all workspaces and workspace groups have been"]
             #[doc = "sent."]
@@ -4473,32 +4209,18 @@ pub mod ext_workspace_v1 {
             #[doc = "ext_workspace_group_handle_v1 objects in question. The compositor sends"]
             #[doc = "the done event only after updating the output information in both"]
             #[doc = "workspace groups."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_manager_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_manager_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event indicates that the compositor is done sending events to the"]
             #[doc = "ext_workspace_manager_v1. The server will destroy the object"]
             #[doc = "immediately after sending this request."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_manager_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_manager_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -4602,13 +4324,12 @@ pub mod ext_workspace_v1 {
             #[doc = "Compositors must send this event once after creation of an"]
             #[doc = "ext_workspace_group_handle_v1. When the capabilities change, compositors"]
             #[doc = "must send this event again."]
-            async fn capabilities(
+            fn capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capabilities: GroupCapabilities,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_group_handle_v1#{}.capabilities({})",
                     object.id,
                     capabilities
@@ -4616,21 +4337,17 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(capabilities.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is emitted whenever an output is assigned to the workspace"]
             #[doc = "group or a new `wl_output` object is bound by the client, which was already"]
             #[doc = "assigned to this workspace_group."]
-            async fn output_enter(
+            fn output_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_group_handle_v1#{}.output_enter({})",
                     object.id,
                     output
@@ -4638,20 +4355,16 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is emitted whenever an output is removed from the workspace"]
             #[doc = "group."]
-            async fn output_leave(
+            fn output_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_group_handle_v1#{}.output_leave({})",
                     object.id,
                     output
@@ -4659,21 +4372,17 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is emitted whenever a workspace is assigned to this group."]
             #[doc = "A workspace may only ever be assigned to a single group at a single point"]
             #[doc = "in time, but can be re-assigned during it's lifetime."]
-            async fn workspace_enter(
+            fn workspace_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_group_handle_v1#{}.workspace_enter({})",
                     object.id,
                     workspace
@@ -4681,19 +4390,15 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is emitted whenever a workspace is removed from this group."]
-            async fn workspace_leave(
+            fn workspace_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_group_handle_v1#{}.workspace_leave({})",
                     object.id,
                     workspace
@@ -4701,10 +4406,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event is send when the group associated with the ext_workspace_group_handle_v1"]
             #[doc = "has been removed. After sending this request the compositor will immediately consider"]
@@ -4714,17 +4416,10 @@ pub mod ext_workspace_v1 {
             #[doc = ""]
             #[doc = "The compositor must remove all workspaces belonging to a workspace group"]
             #[doc = "via a workspace_leave event before removing the workspace group."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_group_handle_v1#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_group_handle_v1#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -4885,33 +4580,20 @@ pub mod ext_workspace_v1 {
             #[doc = "sessions and can be used by clients to store preferences for workspaces. Workspaces without"]
             #[doc = "ids should be considered temporary and any data associated with them should be deleted once"]
             #[doc = "the respective object is lost."]
-            async fn id(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_handle_v1#{}.id(\"{}\")", object.id, id);
+            fn id(&self, object: &crate::server::Object, id: String) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_handle_v1#{}.id(\"{}\")", object.id, id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is emitted immediately after the ext_workspace_handle_v1 is"]
             #[doc = "created and whenever the name of the workspace changes."]
             #[doc = ""]
             #[doc = "A name is meant to be human-readable and can be displayed to a user."]
             #[doc = "Unlike the id it is neither stable nor unique."]
-            async fn name(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn name(&self, object: &crate::server::Object, name: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_handle_v1#{}.name(\"{}\")",
                     object.id,
                     name
@@ -4919,10 +4601,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is used to organize workspaces into an N-dimensional grid"]
             #[doc = "within a workspace group, and if supported, is emitted immediately after"]
@@ -4942,13 +4621,12 @@ pub mod ext_workspace_v1 {
             #[doc = "bounded; there may be a workspace at coordinate 1 and another at"]
             #[doc = "coordinate 1000 and none in between. Within a workspace group, however,"]
             #[doc = "workspaces must have unique coordinates of equal dimensionality."]
-            async fn coordinates(
+            fn coordinates(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 coordinates: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_handle_v1#{}.coordinates(array[{}])",
                     object.id,
                     coordinates.len()
@@ -4956,10 +4634,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_array(coordinates)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is emitted immediately after the ext_workspace_handle_v1 is"]
             #[doc = "created and each time the workspace state changes, either because of a"]
@@ -4967,20 +4642,12 @@ pub mod ext_workspace_v1 {
             #[doc = ""]
             #[doc = "Missing states convey the opposite meaning, e.g. an unset active bit"]
             #[doc = "means the workspace is currently inactive."]
-            async fn state(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                state: State,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_handle_v1#{}.state({})", object.id, state);
+            fn state(&self, object: &crate::server::Object, state: State) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_handle_v1#{}.state({})", object.id, state);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(state.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event advertises the capabilities supported by the compositor. If"]
             #[doc = "a capability isn't supported, clients should hide or disable the UI"]
@@ -4995,13 +4662,12 @@ pub mod ext_workspace_v1 {
             #[doc = "Compositors must send this event once after creation of an"]
             #[doc = "ext_workspace_handle_v1 . When the capabilities change, compositors"]
             #[doc = "must send this event again."]
-            async fn capabilities(
+            fn capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capabilities: WorkspaceCapabilities,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> ext_workspace_handle_v1#{}.capabilities({})",
                     object.id,
                     capabilities
@@ -5009,10 +4675,7 @@ pub mod ext_workspace_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(capabilities.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event is send when the workspace associated with the ext_workspace_handle_v1"]
             #[doc = "has been removed. After sending this request, the compositor will immediately consider"]
@@ -5023,17 +4686,10 @@ pub mod ext_workspace_v1 {
             #[doc = ""]
             #[doc = "The compositor must only remove a workspaces not currently belonging to any"]
             #[doc = "workspace_group."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> ext_workspace_handle_v1#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> ext_workspace_handle_v1#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -5423,22 +5079,18 @@ pub mod fractional_scale_v1 {
             #[doc = "compositor suggests that the client should use."]
             #[doc = ""]
             #[doc = "The sent scale is the numerator of a fraction with a denominator of 120."]
-            async fn preferred_scale(
+            fn preferred_scale(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 scale: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_fractional_scale_v1#{}.preferred_scale({})",
                     object.id,
                     scale
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(scale).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -6765,13 +6417,8 @@ pub mod xdg_activation_v1 {
             ) -> crate::server::Result<()>;
             #[doc = "The 'done' event contains the unique token of this activation request"]
             #[doc = "and notifies that the provider is done."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                token: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn done(&self, object: &crate::server::Object, token: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_activation_token_v1#{}.done(\"{}\")",
                     object.id,
                     token
@@ -6779,10 +6426,7 @@ pub mod xdg_activation_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(token))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -7418,35 +7062,20 @@ pub mod xdg_toplevel_icon_v1 {
             #[doc = "A sequence of 'icon_size' events must be finished with a 'done' event."]
             #[doc = "If the compositor has no size preferences, it must still send the"]
             #[doc = "'done' event, without any preceding 'icon_size' events."]
-            async fn icon_size(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                size: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn icon_size(&self, object: &crate::server::Object, size: i32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_toplevel_icon_manager_v1#{}.icon_size({})",
                     object.id,
                     size
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(size).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent after all 'icon_size' events have been sent."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_toplevel_icon_manager_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> xdg_toplevel_icon_manager_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }

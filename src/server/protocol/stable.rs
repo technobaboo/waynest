@@ -187,18 +187,10 @@ pub mod linux_dmabuf_v1 {
             #[doc = "Starting version 4, the format event is deprecated and must not be"]
             #[doc = "sent by compositors. Instead, use get_default_feedback or"]
             #[doc = "get_surface_feedback."]
-            async fn format(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                format: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_linux_dmabuf_v1#{}.format({})", object.id, format);
+            fn format(&self, object: &crate::server::Object, format: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_linux_dmabuf_v1#{}.format({})", object.id, format);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(format).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event advertises the formats that the server supports, along with"]
             #[doc = "the modifiers supported for each format. All the supported modifiers"]
@@ -223,15 +215,14 @@ pub mod linux_dmabuf_v1 {
             #[doc = "Starting version 4, the modifier event is deprecated and must not be"]
             #[doc = "sent by compositors. Instead, use get_default_feedback or"]
             #[doc = "get_surface_feedback."]
-            async fn modifier(
+            fn modifier(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: u32,
                 modifier_hi: u32,
                 modifier_lo: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_v1#{}.modifier({}, {}, {})",
                     object.id,
                     format,
@@ -243,10 +234,7 @@ pub mod linux_dmabuf_v1 {
                     .put_uint(modifier_hi)
                     .put_uint(modifier_lo)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -572,13 +560,12 @@ pub mod linux_dmabuf_v1 {
             #[doc = ""]
             #[doc = "Upon receiving this event, the client should destroy the"]
             #[doc = "zwp_linux_buffer_params_v1 object."]
-            async fn created(
+            fn created(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 buffer: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_buffer_params_v1#{}.created({})",
                     object.id,
                     buffer
@@ -586,10 +573,7 @@ pub mod linux_dmabuf_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(buffer))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted buffer creation has"]
             #[doc = "failed. It usually means that one of the dmabuf constraints"]
@@ -597,17 +581,10 @@ pub mod linux_dmabuf_v1 {
             #[doc = ""]
             #[doc = "Upon receiving this event, the client should destroy the"]
             #[doc = "zwp_linux_buffer_params_v1 object."]
-            async fn failed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_linux_buffer_params_v1#{}.failed()", object.id,);
+            fn failed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_linux_buffer_params_v1#{}.failed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -691,17 +668,10 @@ pub mod linux_dmabuf_v1 {
             #[doc = ""]
             #[doc = "This allows changes to the wp_linux_dmabuf_feedback parameters to be"]
             #[doc = "seen as atomic, even if they happen via multiple events."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_linux_dmabuf_feedback_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_linux_dmabuf_feedback_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event provides a file descriptor which can be memory-mapped to"]
             #[doc = "access the format and modifier table."]
@@ -717,14 +687,13 @@ pub mod linux_dmabuf_v1 {
             #[doc = "event has been sent. Instead, compositors must create a new, separate"]
             #[doc = "table file and re-send feedback parameters. Compositors are allowed to"]
             #[doc = "store duplicate format + modifier pairs in the table."]
-            async fn format_table(
+            fn format_table(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 fd: rustix::fd::OwnedFd,
                 size: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.format_table({}, {})",
                     object.id,
                     fd.as_raw_fd(),
@@ -734,10 +703,7 @@ pub mod linux_dmabuf_v1 {
                     .put_fd(fd)
                     .put_uint(size)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event advertises the main device that the server prefers to use"]
             #[doc = "when direct scan-out to the target device isn't possible. The"]
@@ -762,41 +728,30 @@ pub mod linux_dmabuf_v1 {
             #[doc = "If explicit modifiers are not supported and the client performs buffer"]
             #[doc = "allocations on a different device than the main device, then the client"]
             #[doc = "must force the buffer to have a linear layout."]
-            async fn main_device(
+            fn main_device(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 device: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.main_device(array[{}])",
                     object.id,
                     device.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(device).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event splits tranche_target_device and tranche_formats events in"]
             #[doc = "preference tranches. It is sent after a set of tranche_target_device"]
             #[doc = "and tranche_formats events; it represents the end of a tranche. The"]
             #[doc = "next tranche will have a lower preference."]
-            async fn tranche_done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn tranche_done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.tranche_done()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event advertises the target device that the server prefers to use"]
             #[doc = "for a buffer created given this tranche. The advertised target device"]
@@ -824,22 +779,18 @@ pub mod linux_dmabuf_v1 {
             #[doc = "comparing the dev_t value."]
             #[doc = ""]
             #[doc = "This event is tied to a preference tranche, see the tranche_done event."]
-            async fn tranche_target_device(
+            fn tranche_target_device(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 device: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.tranche_target_device(array[{}])",
                     object.id,
                     device.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(device).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event advertises the format + modifier combinations that the"]
             #[doc = "compositor supports."]
@@ -865,13 +816,12 @@ pub mod linux_dmabuf_v1 {
             #[doc = ""]
             #[doc = "For the definition of the format and modifier codes, see the"]
             #[doc = "wp_linux_buffer_params.create request."]
-            async fn tranche_formats(
+            fn tranche_formats(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 indices: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.tranche_formats(array[{}])",
                     object.id,
                     indices.len()
@@ -879,10 +829,7 @@ pub mod linux_dmabuf_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_array(indices)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "This event sets tranche-specific flags."]
             #[doc = ""]
@@ -892,13 +839,12 @@ pub mod linux_dmabuf_v1 {
             #[doc = "device is implementation-defined."]
             #[doc = ""]
             #[doc = "This event is tied to a preference tranche, see the tranche_done event."]
-            async fn tranche_flags(
+            fn tranche_flags(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 flags: TrancheFlags,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_linux_dmabuf_feedback_v1#{}.tranche_flags({})",
                     object.id,
                     flags
@@ -906,10 +852,7 @@ pub mod linux_dmabuf_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(flags.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
         }
     }
@@ -1059,18 +1002,14 @@ pub mod presentation_time {
             #[doc = "irrelevant. Precision of one millisecond or better is"]
             #[doc = "recommended. Clients must be able to query the current clock"]
             #[doc = "value directly, not by asking the compositor."]
-            async fn clock_id(
+            fn clock_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 clk_id: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_presentation#{}.clock_id({})", object.id, clk_id);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> wp_presentation#{}.clock_id({})", object.id, clk_id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(clk_id).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -1130,13 +1069,12 @@ pub mod presentation_time {
             #[doc = "times, this event is sent for each bound instance that matches"]
             #[doc = "the synchronized output. If a client has not bound to the"]
             #[doc = "right wl_output global at all, this event is not sent."]
-            async fn sync_output(
+            fn sync_output(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_presentation_feedback#{}.sync_output({})",
                     object.id,
                     output
@@ -1144,10 +1082,7 @@ pub mod presentation_time {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The associated content update was displayed to the user at the"]
             #[doc = "indicated time (tv_sec_hi/lo, tv_nsec). For the interpretation of"]
@@ -1193,10 +1128,9 @@ pub mod presentation_time {
             #[doc = "refresh cycle, or the output device is self-refreshing without"]
             #[doc = "a way to query the refresh count, then the arguments seq_hi"]
             #[doc = "and seq_lo must be zero."]
-            async fn presented(
+            fn presented(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
@@ -1204,8 +1138,8 @@ pub mod presentation_time {
                 seq_hi: u32,
                 seq_lo: u32,
                 flags: Kind,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wp_presentation_feedback#{}.presented({}, {}, {}, {}, {}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -1225,23 +1159,13 @@ pub mod presentation_time {
                     .put_uint(seq_lo)
                     .put_uint(flags.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The content update was never displayed to the user."]
-            async fn discarded(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wp_presentation_feedback#{}.discarded()", object.id,);
+            fn discarded(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wp_presentation_feedback#{}.discarded()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -1439,39 +1363,31 @@ pub mod tablet_v2 {
             #[doc = "seat. This event only provides the object id of the tablet, any"]
             #[doc = "static information about the tablet (device name, vid/pid, etc.) is"]
             #[doc = "sent through the wp_tablet interface."]
-            async fn tablet_added(
+            fn tablet_added(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_seat_v2#{}.tablet_added({})", object.id, id);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_seat_v2#{}.tablet_added({})", object.id, id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent whenever a tool that has not previously been used"]
             #[doc = "with a tablet comes into use. This event only provides the object id"]
             #[doc = "of the tool; any static information about the tool (capabilities,"]
             #[doc = "type, etc.) is sent through the wp_tablet_tool interface."]
-            async fn tool_added(
+            fn tool_added(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_seat_v2#{}.tool_added({})", object.id, id);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_seat_v2#{}.tool_added({})", object.id, id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is sent whenever a new pad is known to the system. Typically,"]
             #[doc = "pads are physically attached to tablets and a pad_added event is"]
@@ -1483,20 +1399,16 @@ pub mod tablet_v2 {
             #[doc = "This event only provides the object id of the pad. All further"]
             #[doc = "features (buttons, strips, rings) are sent through the wp_tablet_pad"]
             #[doc = "interface."]
-            async fn pad_added(
+            fn pad_added(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_seat_v2#{}.pad_added({})", object.id, id);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_seat_v2#{}.pad_added({})", object.id, id);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -1758,20 +1670,16 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_tool.done event."]
-            async fn r#type(
+            fn r#type(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tool_type: Type,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.type({})", object.id, tool_type);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.type({})", object.id, tool_type);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(tool_type as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "If the physical tool can be identified by a unique 64-bit serial"]
             #[doc = "number, this event notifies the client of this serial number."]
@@ -1788,14 +1696,13 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_tool.done event."]
-            async fn hardware_serial(
+            fn hardware_serial(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 hardware_serial_hi: u32,
                 hardware_serial_lo: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.hardware_serial({}, {})",
                     object.id,
                     hardware_serial_hi,
@@ -1805,10 +1712,7 @@ pub mod tablet_v2 {
                     .put_uint(hardware_serial_hi)
                     .put_uint(hardware_serial_lo)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event notifies the client of a hardware id available on this tool."]
             #[doc = ""]
@@ -1820,14 +1724,13 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_tool.done event."]
-            async fn hardware_id_wacom(
+            fn hardware_id_wacom(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 hardware_id_hi: u32,
                 hardware_id_lo: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.hardware_id_wacom({}, {})",
                     object.id,
                     hardware_id_hi,
@@ -1837,10 +1740,7 @@ pub mod tablet_v2 {
                     .put_uint(hardware_id_hi)
                     .put_uint(hardware_id_lo)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event notifies the client of any capabilities of this tool,"]
             #[doc = "beyond the main set of x/y axes and tip up/down detection."]
@@ -1849,13 +1749,12 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_tool.done event."]
-            async fn capability(
+            fn capability(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capability: Capability,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.capability({})",
                     object.id,
                     capability
@@ -1863,25 +1762,15 @@ pub mod tablet_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(capability as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event signals the end of the initial burst of descriptive"]
             #[doc = "events. A client may consider the static description of the tool to"]
             #[doc = "be complete and finalize initialization of the tool."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event is sent when the tool is removed from the system and will"]
             #[doc = "send no further events. Should the physical tool come back into"]
@@ -1897,17 +1786,10 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "When this event is received, the client must wp_tablet_tool.destroy"]
             #[doc = "the object."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "Notification that this tool is focused on a certain surface."]
             #[doc = ""]
@@ -1918,15 +1800,14 @@ pub mod tablet_v2 {
             #[doc = "If any button is logically down when the tool comes into proximity,"]
             #[doc = "the respective button event is sent after the proximity_in event but"]
             #[doc = "within the same frame as the proximity_in event."]
-            async fn proximity_in(
+            fn proximity_in(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 tablet: crate::wire::ObjectId,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.proximity_in({}, {}, {})",
                     object.id,
                     serial,
@@ -1938,10 +1819,7 @@ pub mod tablet_v2 {
                     .put_object(Some(tablet))
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "Notification that this tool has either left proximity, or is no"]
             #[doc = "longer focused on a certain surface."]
@@ -1955,17 +1833,10 @@ pub mod tablet_v2 {
             #[doc = "changes from one surface to another, a button release event may not"]
             #[doc = "be sent until the button is actually released or the tool leaves the"]
             #[doc = "proximity of the tablet."]
-            async fn proximity_out(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.proximity_out()", object.id,);
+            fn proximity_out(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.proximity_out()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "Sent whenever the tablet tool comes in contact with the surface of the"]
             #[doc = "tablet."]
@@ -1979,18 +1850,10 @@ pub mod tablet_v2 {
             #[doc = "contact. On some devices, a compositor may not consider a tool in"]
             #[doc = "logical contact until a minimum physical pressure threshold is"]
             #[doc = "exceeded."]
-            async fn down(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                serial: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.down({})", object.id, serial);
+            fn down(&self, object: &crate::server::Object, serial: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.down({})", object.id, serial);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(serial).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "Sent whenever the tablet tool stops making contact with the surface of"]
             #[doc = "the tablet, or when the tablet tool moves out of the input region"]
@@ -2008,88 +1871,68 @@ pub mod tablet_v2 {
             #[doc = "contact. On some devices, a compositor may not consider a tool out"]
             #[doc = "of logical contact until physical pressure falls below a specific"]
             #[doc = "threshold."]
-            async fn up(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.up()", object.id,);
+            fn up(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.up()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "Sent whenever a tablet tool moves."]
-            async fn motion(
+            fn motion(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: crate::wire::Fixed,
                 y: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.motion({}, {})", object.id, x, y);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.motion({}, {})", object.id, x, y);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_fixed(x)
                     .put_fixed(y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "Sent whenever the pressure axis on a tool changes. The value of this"]
             #[doc = "event is normalized to a value between 0 and 65535."]
             #[doc = ""]
             #[doc = "Note that pressure may be nonzero even when a tool is not in logical"]
             #[doc = "contact. See the down and up events for more details."]
-            async fn pressure(
+            fn pressure(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 pressure: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.pressure({})", object.id, pressure);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.pressure({})", object.id, pressure);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(pressure)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "Sent whenever the distance axis on a tool changes. The value of this"]
             #[doc = "event is normalized to a value between 0 and 65535."]
             #[doc = ""]
             #[doc = "Note that distance may be nonzero even when a tool is not in logical"]
             #[doc = "contact. See the down and up events for more details."]
-            async fn distance(
+            fn distance(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 distance: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.distance({})", object.id, distance);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.distance({})", object.id, distance);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(distance)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
             #[doc = "Sent whenever one or both of the tilt axes on a tool change. Each tilt"]
             #[doc = "value is in degrees, relative to the z-axis of the tablet."]
             #[doc = "The angle is positive when the top of a tool tilts along the"]
             #[doc = "positive x or y axis."]
-            async fn tilt(
+            fn tilt(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tilt_x: crate::wire::Fixed,
                 tilt_y: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.tilt({}, {})",
                     object.id,
                     tilt_x,
@@ -2099,46 +1942,35 @@ pub mod tablet_v2 {
                     .put_fixed(tilt_x)
                     .put_fixed(tilt_y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 13u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 13u16, payload, fds)
             }
             #[doc = "Sent whenever the z-rotation axis on the tool changes. The"]
             #[doc = "rotation value is in degrees clockwise from the tool's"]
             #[doc = "logical neutral position."]
-            async fn rotation(
+            fn rotation(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 degrees: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.rotation({})", object.id, degrees);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.rotation({})", object.id, degrees);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_fixed(degrees)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 14u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 14u16, payload, fds)
             }
             #[doc = "Sent whenever the slider position on the tool changes. The"]
             #[doc = "value is normalized between -65535 and 65535, with 0 as the logical"]
             #[doc = "neutral position of the slider."]
             #[doc = ""]
             #[doc = "The slider is available on e.g. the Wacom Airbrush tool."]
-            async fn slider(
+            fn slider(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 position: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.slider({})", object.id, position);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.slider({})", object.id, position);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(position).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 15u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 15u16, payload, fds)
             }
             #[doc = "Sent whenever the wheel on the tool emits an event. This event"]
             #[doc = "contains two values for the same axis change. The degrees value is"]
@@ -2152,14 +1984,13 @@ pub mod tablet_v2 {
             #[doc = "click and emulate click events when a certain threshold is met."]
             #[doc = "Thus, wl_tablet_tool.wheel events with non-zero clicks values may"]
             #[doc = "have different degrees values."]
-            async fn wheel(
+            fn wheel(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 degrees: crate::wire::Fixed,
                 clicks: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.wheel({}, {})",
                     object.id,
                     degrees,
@@ -2169,10 +2000,7 @@ pub mod tablet_v2 {
                     .put_fixed(degrees)
                     .put_int(clicks)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 16u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 16u16, payload, fds)
             }
             #[doc = "Sent whenever a button on the tool is pressed or released."]
             #[doc = ""]
@@ -2180,15 +2008,14 @@ pub mod tablet_v2 {
             #[doc = "button events are generated by the compositor. See"]
             #[doc = "wp_tablet_tool.proximity_in and wp_tablet_tool.proximity_out for"]
             #[doc = "details."]
-            async fn button(
+            fn button(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 button: u32,
                 state: ButtonState,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_tool_v2#{}.button({}, {}, {})",
                     object.id,
                     serial,
@@ -2200,27 +2027,16 @@ pub mod tablet_v2 {
                     .put_uint(button)
                     .put_uint(state as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 17u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 17u16, payload, fds)
             }
             #[doc = "Marks the end of a series of axis and/or button updates from the"]
             #[doc = "tablet. The Wayland protocol requires axis updates to be sent"]
             #[doc = "sequentially, however all events within a frame should be considered"]
             #[doc = "one hardware event."]
-            async fn frame(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                time: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_tool_v2#{}.frame({})", object.id, time);
+            fn frame(&self, object: &crate::server::Object, time: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_tool_v2#{}.frame({})", object.id, time);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(time).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 18u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 18u16, payload, fds)
             }
         }
     }
@@ -2275,20 +2091,12 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet.done event."]
-            async fn name(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_v2#{}.name(\"{}\")", object.id, name);
+            fn name(&self, object: &crate::server::Object, name: String) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_v2#{}.name(\"{}\")", object.id, name);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The USB vendor and product IDs for the tablet device."]
             #[doc = ""]
@@ -2297,22 +2105,18 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet.done event."]
-            async fn id(
+            fn id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 vid: u32,
                 pid: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_v2#{}.id({}, {})", object.id, vid, pid);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_v2#{}.id({}, {})", object.id, vid, pid);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(vid)
                     .put_uint(pid)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "A system-specific device path that indicates which device is behind"]
             #[doc = "this wp_tablet. This information may be used to gather additional"]
@@ -2328,53 +2132,31 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet.done event."]
-            async fn path(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                path: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_v2#{}.path(\"{}\")", object.id, path);
+            fn path(&self, object: &crate::server::Object, path: String) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_v2#{}.path(\"{}\")", object.id, path);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(path))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is sent immediately to signal the end of the initial"]
             #[doc = "burst of descriptive events. A client may consider the static"]
             #[doc = "description of the tablet to be complete and finalize initialization"]
             #[doc = "of the tablet."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "Sent when the tablet has been removed from the system. When a tablet"]
             #[doc = "is removed, some tools may be removed."]
             #[doc = ""]
             #[doc = "When this event is received, the client must wp_tablet.destroy"]
             #[doc = "the object."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_v2#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_v2#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
         }
     }
@@ -2497,39 +2279,31 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is optional. If the source is unknown for an interaction,"]
             #[doc = "no event is sent."]
-            async fn source(
+            fn source(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 source: Source,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_ring_v2#{}.source({})", object.id, source);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_ring_v2#{}.source({})", object.id, source);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(source as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent whenever the angle on a ring changes."]
             #[doc = ""]
             #[doc = "The angle is provided in degrees clockwise from the logical"]
             #[doc = "north of the ring in the pad's current rotation."]
-            async fn angle(
+            fn angle(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 degrees: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_ring_v2#{}.angle({})", object.id, degrees);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_ring_v2#{}.angle({})", object.id, degrees);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_fixed(degrees)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Stop notification for ring events."]
             #[doc = ""]
@@ -2541,17 +2315,10 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "Any wp_tablet_pad_ring.angle events with the same source after this"]
             #[doc = "event should be considered as the start of a new interaction."]
-            async fn stop(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_ring_v2#{}.stop()", object.id,);
+            fn stop(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_ring_v2#{}.stop()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Indicates the end of a set of ring events that logically belong"]
             #[doc = "together. A client is expected to accumulate the data in all events"]
@@ -2566,18 +2333,10 @@ pub mod tablet_v2 {
             #[doc = "group, even if the group only contains a single wp_tablet_pad_ring"]
             #[doc = "event. Specifically, a client may get a sequence: angle, frame,"]
             #[doc = "angle, frame, etc."]
-            async fn frame(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                time: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_ring_v2#{}.frame({})", object.id, time);
+            fn frame(&self, object: &crate::server::Object, time: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_ring_v2#{}.frame({})", object.id, time);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(time).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -2700,13 +2459,12 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is optional. If the source is unknown for an interaction,"]
             #[doc = "no event is sent."]
-            async fn source(
+            fn source(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 source: Source,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_strip_v2#{}.source({})",
                     object.id,
                     source
@@ -2714,23 +2472,19 @@ pub mod tablet_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(source as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent whenever the position on a strip changes."]
             #[doc = ""]
             #[doc = "The position is normalized to a range of [0, 65535], the 0-value"]
             #[doc = "represents the top-most and/or left-most position of the strip in"]
             #[doc = "the pad's current rotation."]
-            async fn position(
+            fn position(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 position: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_strip_v2#{}.position({})",
                     object.id,
                     position
@@ -2738,10 +2492,7 @@ pub mod tablet_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(position)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Stop notification for strip events."]
             #[doc = ""]
@@ -2753,17 +2504,10 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "Any wp_tablet_pad_strip.position events with the same source after this"]
             #[doc = "event should be considered as the start of a new interaction."]
-            async fn stop(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_strip_v2#{}.stop()", object.id,);
+            fn stop(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_strip_v2#{}.stop()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Indicates the end of a set of events that represent one logical"]
             #[doc = "hardware strip event. A client is expected to accumulate the data"]
@@ -2779,18 +2523,10 @@ pub mod tablet_v2 {
             #[doc = "group, even if the group only contains a single wp_tablet_pad_strip"]
             #[doc = "event. Specifically, a client may get a sequence: position, frame,"]
             #[doc = "position, frame, etc."]
-            async fn frame(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                time: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_strip_v2#{}.frame({})", object.id, time);
+            fn frame(&self, object: &crate::server::Object, time: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_strip_v2#{}.frame({})", object.id, time);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(time).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -2865,13 +2601,12 @@ pub mod tablet_v2 {
             #[doc = "event in the case of changes to the mapping of these reserved buttons."]
             #[doc = "If the compositor happens to reserve all buttons in a group, this event"]
             #[doc = "will be sent with an empty array."]
-            async fn buttons(
+            fn buttons(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 buttons: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_group_v2#{}.buttons(array[{}])",
                     object.id,
                     buttons.len()
@@ -2879,50 +2614,39 @@ pub mod tablet_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_array(buttons)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent on wp_tablet_pad_group initialization to announce available rings."]
             #[doc = "One event is sent for each ring available on this pad group."]
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad_group.done event."]
-            async fn ring(
+            fn ring(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 ring: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_group_v2#{}.ring({})", object.id, ring);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_group_v2#{}.ring({})", object.id, ring);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(ring))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Sent on wp_tablet_pad initialization to announce available strips."]
             #[doc = "One event is sent for each strip available on this pad group."]
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad_group.done event."]
-            async fn strip(
+            fn strip(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 strip: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_group_v2#{}.strip({})", object.id, strip);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_group_v2#{}.strip({})", object.id, strip);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(strip))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Sent on wp_tablet_pad_group initialization to announce that the pad"]
             #[doc = "group may switch between modes. A client may use a mode to store a"]
@@ -2936,34 +2660,19 @@ pub mod tablet_v2 {
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad_group.done event. This event is only sent when more than"]
             #[doc = "more than one mode is available."]
-            async fn modes(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                modes: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_group_v2#{}.modes({})", object.id, modes);
+            fn modes(&self, object: &crate::server::Object, modes: u32) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_group_v2#{}.modes({})", object.id, modes);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(modes).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is sent immediately to signal the end of the initial"]
             #[doc = "burst of descriptive events. A client may consider the static"]
             #[doc = "description of the tablet to be complete and finalize initialization"]
             #[doc = "of the tablet group."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_group_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_group_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "Notification that the mode was switched."]
             #[doc = ""]
@@ -2992,15 +2701,14 @@ pub mod tablet_v2 {
             #[doc = "in the previous mode, the client should immediately issue a"]
             #[doc = "wp_tablet_ring.set_feedback or wp_tablet_strip.set_feedback request"]
             #[doc = "for each changed ring or strip."]
-            async fn mode_switch(
+            fn mode_switch(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 time: u32,
                 serial: u32,
                 mode: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_group_v2#{}.mode_switch({}, {}, {})",
                     object.id,
                     time,
@@ -3012,10 +2720,7 @@ pub mod tablet_v2 {
                     .put_uint(serial)
                     .put_uint(mode)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -3160,20 +2865,16 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad.done event. At least one group will be announced."]
-            async fn group(
+            fn group(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 pad_group: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_v2#{}.group({})", object.id, pad_group);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_v2#{}.group({})", object.id, pad_group);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(pad_group))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "A system-specific device path that indicates which device is behind"]
             #[doc = "this wp_tablet_pad. This information may be used to gather additional"]
@@ -3185,20 +2886,12 @@ pub mod tablet_v2 {
             #[doc = ""]
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad.done event."]
-            async fn path(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                path: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_v2#{}.path(\"{}\")", object.id, path);
+            fn path(&self, object: &crate::server::Object, path: String) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_v2#{}.path(\"{}\")", object.id, path);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(path))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Sent on wp_tablet_pad initialization to announce the available"]
             #[doc = "buttons."]
@@ -3206,44 +2899,32 @@ pub mod tablet_v2 {
             #[doc = "This event is sent in the initial burst of events before the"]
             #[doc = "wp_tablet_pad.done event. This event is only sent when at least one"]
             #[doc = "button is available."]
-            async fn buttons(
+            fn buttons(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 buttons: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_v2#{}.buttons({})", object.id, buttons);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_v2#{}.buttons({})", object.id, buttons);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(buttons).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event signals the end of the initial burst of descriptive"]
             #[doc = "events. A client may consider the static description of the pad to"]
             #[doc = "be complete and finalize initialization of the pad."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "Sent whenever the physical state of a button changes."]
-            async fn button(
+            fn button(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 time: u32,
                 button: u32,
                 state: ButtonState,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_v2#{}.button({}, {}, {})",
                     object.id,
                     time,
@@ -3255,21 +2936,17 @@ pub mod tablet_v2 {
                     .put_uint(button)
                     .put_uint(state as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "Notification that this pad is focused on the specified surface."]
-            async fn enter(
+            fn enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 tablet: crate::wire::ObjectId,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_v2#{}.enter({}, {}, {})",
                     object.id,
                     serial,
@@ -3281,21 +2958,17 @@ pub mod tablet_v2 {
                     .put_object(Some(tablet))
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "Notification that this pad is no longer focused on the specified"]
             #[doc = "surface."]
-            async fn leave(
+            fn leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_tablet_pad_v2#{}.leave({}, {})",
                     object.id,
                     serial,
@@ -3305,10 +2978,7 @@ pub mod tablet_v2 {
                     .put_uint(serial)
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "Sent when the pad has been removed from the system. When a tablet"]
             #[doc = "is removed its pad(s) will be removed too."]
@@ -3316,17 +2986,10 @@ pub mod tablet_v2 {
             #[doc = "When this event is received, the client must destroy all rings, strips"]
             #[doc = "and groups that were offered by this pad, and issue wp_tablet_pad.destroy"]
             #[doc = "the pad itself."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zwp_tablet_pad_v2#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zwp_tablet_pad_v2#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
         }
     }
@@ -3785,18 +3448,10 @@ pub mod xdg_shell {
             #[doc = ""]
             #[doc = "A compositor is free to ping in any way it wants, but a client must"]
             #[doc = "always respond to any xdg_wm_base object it created."]
-            async fn ping(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                serial: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_wm_base#{}.ping({})", object.id, serial);
+            fn ping(&self, object: &crate::server::Object, serial: u32) -> crate::wire::Message {
+                tracing::trace!("-> xdg_wm_base#{}.ping({})", object.id, serial);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(serial).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -4487,18 +4142,14 @@ pub mod xdg_shell {
             #[doc = ""]
             #[doc = "If the client receives multiple configure events before it can respond"]
             #[doc = "to one, it is free to discard all but the last event it received."]
-            async fn configure(
+            fn configure(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_surface#{}.configure({})", object.id, serial);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> xdg_surface#{}.configure({})", object.id, serial);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(serial).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -5198,15 +4849,14 @@ pub mod xdg_shell {
             #[doc = ""]
             #[doc = "Clients must send an ack_configure in response to this event. See"]
             #[doc = "xdg_surface.configure and xdg_surface.ack_configure for details."]
-            async fn configure(
+            fn configure(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 width: i32,
                 height: i32,
                 states: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_toplevel#{}.configure({}, {}, array[{}])",
                     object.id,
                     width,
@@ -5218,10 +4868,7 @@ pub mod xdg_shell {
                     .put_int(height)
                     .put_array(states)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The close event is sent by the compositor when the user"]
             #[doc = "wants the surface to be closed. This should be equivalent to"]
@@ -5231,17 +4878,10 @@ pub mod xdg_shell {
             #[doc = "This is only a request that the user intends to close the"]
             #[doc = "window. The client may choose to ignore this request, or show"]
             #[doc = "a dialog to ask the user to save their data, etc."]
-            async fn close(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_toplevel#{}.close()", object.id,);
+            fn close(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> xdg_toplevel#{}.close()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The configure_bounds event may be sent prior to a xdg_toplevel.configure"]
             #[doc = "event to communicate the bounds a window geometry size is recommended"]
@@ -5258,14 +4898,13 @@ pub mod xdg_shell {
             #[doc = "The bounds may change at any point, and in such a case, a new"]
             #[doc = "xdg_toplevel.configure_bounds will be sent, followed by"]
             #[doc = "xdg_toplevel.configure and xdg_surface.configure."]
-            async fn configure_bounds(
+            fn configure_bounds(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_toplevel#{}.configure_bounds({}, {})",
                     object.id,
                     width,
@@ -5275,10 +4914,7 @@ pub mod xdg_shell {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event advertises the capabilities supported by the compositor. If"]
             #[doc = "a capability isn't supported, clients should hide or disable the UI"]
@@ -5300,13 +4936,12 @@ pub mod xdg_shell {
             #[doc = ""]
             #[doc = "The capabilities are sent as an array of 32-bit unsigned integers in"]
             #[doc = "native endianness."]
-            async fn wm_capabilities(
+            fn wm_capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capabilities: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_toplevel#{}.wm_capabilities(array[{}])",
                     object.id,
                     capabilities.len()
@@ -5314,10 +4949,7 @@ pub mod xdg_shell {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_array(capabilities)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -5516,16 +5148,15 @@ pub mod xdg_shell {
             #[doc = "ever sent once for the initial configuration. Starting with version 3,"]
             #[doc = "it may be sent again if the popup is setup with an xdg_positioner with"]
             #[doc = "set_reactive requested, or in response to xdg_popup.reposition requests."]
-            async fn configure(
+            fn configure(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> xdg_popup#{}.configure({}, {}, {}, {})",
                     object.id,
                     x,
@@ -5539,25 +5170,15 @@ pub mod xdg_shell {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The popup_done event is sent out when a popup is dismissed by the"]
             #[doc = "compositor. The client should destroy the xdg_popup object at this"]
             #[doc = "point."]
-            async fn popup_done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_popup#{}.popup_done()", object.id,);
+            fn popup_done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> xdg_popup#{}.popup_done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The repositioned event is sent as part of a popup configuration"]
             #[doc = "sequence, together with xdg_popup.configure and lastly"]
@@ -5574,18 +5195,14 @@ pub mod xdg_shell {
             #[doc = "The client should optionally update the content of the popup, but must"]
             #[doc = "acknowledge the new popup configuration for the new position to take"]
             #[doc = "effect. See xdg_surface.ack_configure for details."]
-            async fn repositioned(
+            fn repositioned(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 token: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> xdg_popup#{}.repositioned({})", object.id, token);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> xdg_popup#{}.repositioned({})", object.id, token);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(token).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }

@@ -330,10 +330,9 @@ pub mod frog_color_management_v1 {
             #[doc = ""]
             #[doc = "This metadata does not necessarily correspond to any physical output, but"]
             #[doc = "rather what the compositor thinks would be best for a given surface."]
-            async fn preferred_metadata(
+            fn preferred_metadata(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 transfer_function: TransferFunction,
                 output_display_primary_red_x: u32,
                 output_display_primary_red_y: u32,
@@ -346,8 +345,8 @@ pub mod frog_color_management_v1 {
                 max_luminance: u32,
                 min_luminance: u32,
                 max_full_frame_luminance: u32,
-            ) -> crate::server::Result<()> {
-                tracing :: debug ! ("-> frog_color_managed_surface#{}.preferred_metadata({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})" , object . id , transfer_function , output_display_primary_red_x , output_display_primary_red_y , output_display_primary_green_x , output_display_primary_green_y , output_display_primary_blue_x , output_display_primary_blue_y , output_white_point_x , output_white_point_y , max_luminance , min_luminance , max_full_frame_luminance);
+            ) -> crate::wire::Message {
+                tracing :: trace ! ("-> frog_color_managed_surface#{}.preferred_metadata({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})" , object . id , transfer_function , output_display_primary_red_x , output_display_primary_red_y , output_display_primary_green_x , output_display_primary_green_y , output_display_primary_blue_x , output_display_primary_blue_y , output_white_point_x , output_white_point_y , max_luminance , min_luminance , max_full_frame_luminance);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(transfer_function as u32)
                     .put_uint(output_display_primary_red_x)
@@ -362,10 +361,7 @@ pub mod frog_color_management_v1 {
                     .put_uint(min_luminance)
                     .put_uint(max_full_frame_luminance)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }

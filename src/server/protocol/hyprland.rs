@@ -315,17 +315,10 @@ pub mod hyprland_focus_grab_v1 {
             ) -> crate::server::Result<()>;
             #[doc = "Sent when an active grab is cancelled by the compositor,"]
             #[doc = "regardless of cause."]
-            async fn cleared(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> hyprland_focus_grab_v1#{}.cleared()", object.id,);
+            fn cleared(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> hyprland_focus_grab_v1#{}.cleared()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -487,15 +480,14 @@ pub mod hyprland_global_shortcuts_v1 {
             #[doc = "The keystroke was pressed."]
             #[doc = ""]
             #[doc = "tv_ values hold the timestamp of the occurrence."]
-            async fn pressed(
+            fn pressed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_global_shortcut_v1#{}.pressed({}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -507,23 +499,19 @@ pub mod hyprland_global_shortcuts_v1 {
                     .put_uint(tv_sec_lo)
                     .put_uint(tv_nsec)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The keystroke was released."]
             #[doc = ""]
             #[doc = "tv_ values hold the timestamp of the occurrence."]
-            async fn released(
+            fn released(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_global_shortcut_v1#{}.released({}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -535,10 +523,7 @@ pub mod hyprland_global_shortcuts_v1 {
                     .put_uint(tv_sec_lo)
                     .put_uint(tv_nsec)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -968,16 +953,15 @@ pub mod hyprland_toplevel_export_v1 {
             #[doc = "Provides information about wl_shm buffer parameters that need to be"]
             #[doc = "used for this frame. This event is sent once after the frame is created"]
             #[doc = "if wl_shm buffers are supported."]
-            async fn buffer(
+            fn buffer(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: super::super::super::core::wayland::wl_shm::Format,
                 width: u32,
                 height: u32,
                 stride: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.buffer({}, {}, {}, {})",
                     object.id,
                     format,
@@ -991,10 +975,7 @@ pub mod hyprland_toplevel_export_v1 {
                     .put_uint(height)
                     .put_uint(stride)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent right before the ready event when ignore_damage was"]
             #[doc = "not set. It may be generated multiple times for each copy"]
@@ -1006,16 +987,15 @@ pub mod hyprland_toplevel_export_v1 {
             #[doc = ""]
             #[doc = "The union of all regions received between the call to copy"]
             #[doc = "and a ready event is the total damage since the prior ready event."]
-            async fn damage(
+            fn damage(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: u32,
                 y: u32,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.damage({}, {}, {}, {})",
                     object.id,
                     x,
@@ -1029,20 +1009,12 @@ pub mod hyprland_toplevel_export_v1 {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Provides flags about the frame. This event is sent once before the"]
             #[doc = "\"ready\" event."]
-            async fn flags(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                flags: Flags,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn flags(&self, object: &crate::server::Object, flags: Flags) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.flags({})",
                     object.id,
                     flags
@@ -1050,10 +1022,7 @@ pub mod hyprland_toplevel_export_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(flags.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Called as soon as the frame is copied, indicating it is available"]
             #[doc = "for reading. This event includes the time at which presentation happened"]
@@ -1067,15 +1036,14 @@ pub mod hyprland_toplevel_export_v1 {
             #[doc = "may have an arbitrary offset at start."]
             #[doc = ""]
             #[doc = "After receiving this event, the client should destroy the object."]
-            async fn ready(
+            fn ready(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.ready({}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -1087,41 +1055,30 @@ pub mod hyprland_toplevel_export_v1 {
                     .put_uint(tv_sec_lo)
                     .put_uint(tv_nsec)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted frame copy has failed."]
             #[doc = ""]
             #[doc = "After receiving this event, the client should destroy the object."]
-            async fn failed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn failed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.failed()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "Provides information about linux-dmabuf buffer parameters that need to"]
             #[doc = "be used for this frame. This event is sent once after the frame is"]
             #[doc = "created if linux-dmabuf buffers are supported."]
-            async fn linux_dmabuf(
+            fn linux_dmabuf(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: u32,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.linux_dmabuf({}, {}, {})",
                     object.id,
                     format,
@@ -1133,29 +1090,19 @@ pub mod hyprland_toplevel_export_v1 {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "This event is sent once after all buffer events have been sent."]
             #[doc = ""]
             #[doc = "The client should proceed to create a buffer of one of the supported"]
             #[doc = "types, and send a \"copy\" request."]
-            async fn buffer_done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn buffer_done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> hyprland_toplevel_export_frame_v1#{}.buffer_done()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
         }
     }

@@ -653,13 +653,12 @@ pub mod dpms {
             #[doc = "This event gets pushed on binding the resource and indicates whether the wl_output"]
             #[doc = "supports DPMS. There are operation modes of a Wayland server where DPMS might not"]
             #[doc = "make sense (e.g. nested compositors)."]
-            async fn supported(
+            fn supported(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 supported: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_dpms#{}.supported({})",
                     object.id,
                     supported
@@ -667,44 +666,26 @@ pub mod dpms {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(supported)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This mode gets pushed on binding the resource and provides the currently used"]
             #[doc = "DPMS mode. It also gets pushed if DPMS is not supported for the wl_output, in that"]
             #[doc = "case the value will be On."]
             #[doc = ""]
             #[doc = "The event is also pushed whenever the state changes."]
-            async fn mode(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                mode: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_dpms#{}.mode({})", object.id, mode);
+            fn mode(&self, object: &crate::server::Object, mode: u32) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_dpms#{}.mode({})", object.id, mode);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(mode).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event gets pushed on binding the resource once all other states are pushed."]
             #[doc = ""]
             #[doc = "In addition it gets pushed whenever a state changes to tell the client that all"]
             #[doc = "state changes have been pushed."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_dpms#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_dpms#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -1263,13 +1244,12 @@ pub mod fullscreen_shell {
             #[doc = "advantage of any of these capabilities, they should use a"]
             #[doc = "wl_display.sync request immediately after binding to ensure that they"]
             #[doc = "receive all the capability events."]
-            async fn capability(
+            fn capability(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capability: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> _wl_fullscreen_shell#{}.capability({})",
                     object.id,
                     capability
@@ -1277,10 +1257,7 @@ pub mod fullscreen_shell {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(capability)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -1315,20 +1292,13 @@ pub mod fullscreen_shell {
             #[doc = ""]
             #[doc = "Upon receiving this event, the client should destroy the"]
             #[doc = "wl_fullscreen_shell_mode_feedback object."]
-            async fn mode_successful(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn mode_successful(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> _wl_fullscreen_shell_mode_feedback#{}.mode_successful()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted mode switch operation"]
             #[doc = "failed. This may be because the requested output mode is not"]
@@ -1336,20 +1306,13 @@ pub mod fullscreen_shell {
             #[doc = ""]
             #[doc = "Upon receiving this event, the client should destroy the"]
             #[doc = "wl_fullscreen_shell_mode_feedback object."]
-            async fn mode_failed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn mode_failed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> _wl_fullscreen_shell_mode_feedback#{}.mode_failed()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted mode switch operation was"]
             #[doc = "cancelled.  Most likely this is because the client requested a"]
@@ -1357,20 +1320,13 @@ pub mod fullscreen_shell {
             #[doc = ""]
             #[doc = "Upon receiving this event, the client should destroy the"]
             #[doc = "wl_fullscreen_shell_mode_feedback object."]
-            async fn present_cancelled(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn present_cancelled(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> _wl_fullscreen_shell_mode_feedback#{}.present_cancelled()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -1488,29 +1444,15 @@ pub mod idle {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn idle(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_idle_timeout#{}.idle()", object.id,);
+            fn idle(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_idle_timeout#{}.idle()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn resumed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_idle_timeout#{}.resumed()", object.id,);
+            fn resumed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_idle_timeout#{}.resumed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -1703,22 +1645,18 @@ pub mod kde_external_brightness_v1 {
             #[doc = "The client must ensure that if the brightness level changes due to external factors,"]
             #[doc = "that it either overwrites those changes with what the compositor last requested,"]
             #[doc = "or commit again with set_observed_brightness specifying the changed brightness."]
-            async fn requested_brightness(
+            fn requested_brightness(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 value: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_external_brightness_device_v1#{}.requested_brightness({})",
                     object.id,
                     value
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(value).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -2078,10 +2016,9 @@ pub mod kde_output_device_v2 {
             #[doc = "The geometry event describes geometric properties of the output."]
             #[doc = "The event is sent when binding to the output object and whenever"]
             #[doc = "any of the properties change."]
-            async fn geometry(
+            fn geometry(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 physical_width: i32,
@@ -2090,8 +2027,8 @@ pub mod kde_output_device_v2 {
                 make: String,
                 model: String,
                 transform: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.geometry({}, {}, {}, {}, {}, \"{}\", \"{}\", {})",
                     object.id,
                     x,
@@ -2113,20 +2050,16 @@ pub mod kde_output_device_v2 {
                     .put_string(Some(model))
                     .put_int(transform)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event describes the mode currently in use for this head. It is only"]
             #[doc = "sent if the output is enabled."]
-            async fn current_mode(
+            fn current_mode(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 mode: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.current_mode({})",
                     object.id,
                     mode
@@ -2134,10 +2067,7 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(mode))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The mode event describes an available mode for the output."]
             #[doc = ""]
@@ -2157,37 +2087,26 @@ pub mod kde_output_device_v2 {
             #[doc = "space. For instance, the output may be scaled, as described in"]
             #[doc = "kde_output_device_v2.scale, or transformed, as described in"]
             #[doc = "kde_output_device_v2.transform."]
-            async fn mode(
+            fn mode(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 mode: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.mode({})", object.id, mode);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.mode({})", object.id, mode);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(mode))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is sent after all other properties have been"]
             #[doc = "sent on binding to the output object as well as after any"]
             #[doc = "other output property change have been applied later on."]
             #[doc = "This allows to see changes to the output properties as atomic,"]
             #[doc = "even if multiple events successively announce them."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event contains scaling geometry information"]
             #[doc = "that is not in the geometry event. It may be sent after"]
@@ -2207,18 +2126,14 @@ pub mod kde_output_device_v2 {
             #[doc = "the scale of the output. That way the compositor can"]
             #[doc = "avoid scaling the surface, and the client can supply"]
             #[doc = "a higher detail image."]
-            async fn scale(
+            fn scale(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 factor: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.scale({})", object.id, factor);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.scale({})", object.id, factor);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_fixed(factor).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "The edid event encapsulates the EDID data for the outputdevice."]
             #[doc = ""]
@@ -2226,65 +2141,44 @@ pub mod kde_output_device_v2 {
             #[doc = "data may be empty, in which case this event is sent anyway."]
             #[doc = "If the EDID information is empty, you can fall back to the name"]
             #[doc = "et al. properties of the outputdevice."]
-            async fn edid(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                raw: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.edid(\"{}\")", object.id, raw);
+            fn edid(&self, object: &crate::server::Object, raw: String) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.edid(\"{}\")", object.id, raw);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(raw))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "The enabled event notifies whether this output is currently"]
             #[doc = "enabled and used for displaying content by the server."]
             #[doc = "The event is sent when binding to the output object and"]
             #[doc = "whenever later on an output changes its state by becoming"]
             #[doc = "enabled or disabled."]
-            async fn enabled(
+            fn enabled(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 enabled: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.enabled({})", object.id, enabled);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.enabled({})", object.id, enabled);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(enabled).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "The uuid can be used to identify the output. It's controlled by"]
             #[doc = "the server entirely. The server should make sure the uuid is"]
             #[doc = "persistent across restarts. An empty uuid is considered invalid."]
-            async fn uuid(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                uuid: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.uuid(\"{}\")", object.id, uuid);
+            fn uuid(&self, object: &crate::server::Object, uuid: String) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.uuid(\"{}\")", object.id, uuid);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(uuid))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "Serial ID of the monitor, sent on startup before the first done event."]
-            async fn serial_number(
+            fn serial_number(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial_number: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.serial_number(\"{}\")",
                     object.id,
                     serial_number
@@ -2292,19 +2186,15 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(serial_number))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "EISA ID of the monitor, sent on startup before the first done event."]
-            async fn eisa_id(
+            fn eisa_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 eisa_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.eisa_id(\"{}\")",
                     object.id,
                     eisa_id
@@ -2312,20 +2202,16 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(eisa_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "What capabilities this device has, sent on startup before the first"]
             #[doc = "done event."]
-            async fn capabilities(
+            fn capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 flags: Capability,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.capabilities({})",
                     object.id,
                     flags
@@ -2333,20 +2219,16 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(flags.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "Overscan value of the monitor in percent, sent on startup before the"]
             #[doc = "first done event."]
-            async fn overscan(
+            fn overscan(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 overscan: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.overscan({})",
                     object.id,
                     overscan
@@ -2354,20 +2236,16 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(overscan)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "What policy the compositor will employ regarding its use of variable"]
             #[doc = "refresh rate."]
-            async fn vrr_policy(
+            fn vrr_policy(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 vrr_policy: VrrPolicy,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.vrr_policy({})",
                     object.id,
                     vrr_policy
@@ -2375,19 +2253,15 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(vrr_policy as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
             #[doc = "What rgb range the compositor is using for this output"]
-            async fn rgb_range(
+            fn rgb_range(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 rgb_range: RgbRange,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.rgb_range({})",
                     object.id,
                     rgb_range
@@ -2395,35 +2269,23 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(rgb_range as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 13u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 13u16, payload, fds)
             }
             #[doc = "Name of the output, it's useful to cross-reference to an zxdg_output_v1 and ultimately QScreen"]
-            async fn name(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_v2#{}.name(\"{}\")", object.id, name);
+            fn name(&self, object: &crate::server::Object, name: String) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_v2#{}.name(\"{}\")", object.id, name);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 14u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 14u16, payload, fds)
             }
             #[doc = "Whether or not high dynamic range is enabled for this output"]
-            async fn high_dynamic_range(
+            fn high_dynamic_range(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 hdr_enabled: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.high_dynamic_range({})",
                     object.id,
                     hdr_enabled
@@ -2431,21 +2293,17 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(hdr_enabled)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 15u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 15u16, payload, fds)
             }
             #[doc = "If high dynamic range is used, this value defines the brightness in nits for content"]
             #[doc = "that's in standard dynamic range format. Note that while the value is in nits, that"]
             #[doc = "doesn't necessarily translate to the same brightness on the screen."]
-            async fn sdr_brightness(
+            fn sdr_brightness(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 sdr_brightness: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.sdr_brightness({})",
                     object.id,
                     sdr_brightness
@@ -2453,19 +2311,15 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(sdr_brightness)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 16u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 16u16, payload, fds)
             }
             #[doc = "Whether or not the use of a wide color gamut is enabled for this output"]
-            async fn wide_color_gamut(
+            fn wide_color_gamut(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 wcg_enabled: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.wide_color_gamut({})",
                     object.id,
                     wcg_enabled
@@ -2473,18 +2327,14 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(wcg_enabled)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 17u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 17u16, payload, fds)
             }
-            async fn auto_rotate_policy(
+            fn auto_rotate_policy(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 policy: AutoRotatePolicy,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.auto_rotate_policy({})",
                     object.id,
                     policy
@@ -2492,18 +2342,14 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(policy as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 18u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 18u16, payload, fds)
             }
-            async fn icc_profile_path(
+            fn icc_profile_path(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 profile_path: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.icc_profile_path(\"{}\")",
                     object.id,
                     profile_path
@@ -2511,20 +2357,16 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(profile_path))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 19u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 19u16, payload, fds)
             }
-            async fn brightness_metadata(
+            fn brightness_metadata(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 max_peak_brightness: u32,
                 max_frame_average_brightness: u32,
                 min_brightness: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.brightness_metadata({}, {}, {})",
                     object.id,
                     max_peak_brightness,
@@ -2536,20 +2378,16 @@ pub mod kde_output_device_v2 {
                     .put_uint(max_frame_average_brightness)
                     .put_uint(min_brightness)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 20u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 20u16, payload, fds)
             }
-            async fn brightness_overrides(
+            fn brightness_overrides(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 max_peak_brightness: i32,
                 max_average_brightness: i32,
                 min_brightness: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.brightness_overrides({}, {}, {})",
                     object.id,
                     max_peak_brightness,
@@ -2561,20 +2399,16 @@ pub mod kde_output_device_v2 {
                     .put_int(max_average_brightness)
                     .put_int(min_brightness)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 21u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 21u16, payload, fds)
             }
             #[doc = "This can be used to provide the colors users assume sRGB applications should have based on the"]
             #[doc = "default experience on many modern sRGB screens."]
-            async fn sdr_gamut_wideness(
+            fn sdr_gamut_wideness(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 gamut_wideness: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.sdr_gamut_wideness({})",
                     object.id,
                     gamut_wideness
@@ -2582,18 +2416,14 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(gamut_wideness)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 22u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 22u16, payload, fds)
             }
-            async fn color_profile_source(
+            fn color_profile_source(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 source: ColorProfileSource,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.color_profile_source({})",
                     object.id,
                     source
@@ -2601,10 +2431,7 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(source as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 23u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 23u16, payload, fds)
             }
             #[doc = "This is the brightness modifier of the output. It doesn't specify"]
             #[doc = "any absolute values, but is merely a multiplier on top of other"]
@@ -2612,13 +2439,12 @@ pub mod kde_output_device_v2 {
             #[doc = "0 is the minimum brightness (not completely dark) and 10000 is"]
             #[doc = "the maximum brightness."]
             #[doc = "This is currently only supported / meaningful while HDR is active."]
-            async fn brightness(
+            fn brightness(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 brightness: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.brightness({})",
                     object.id,
                     brightness
@@ -2626,18 +2452,14 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(brightness)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 24u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 24u16, payload, fds)
             }
-            async fn color_power_tradeoff(
+            fn color_power_tradeoff(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 preference: ColorPowerTradeoff,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.color_power_tradeoff({})",
                     object.id,
                     preference
@@ -2645,10 +2467,7 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(preference as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 25u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 25u16, payload, fds)
             }
             #[doc = "This is the dimming multiplier of the output. This is similar to"]
             #[doc = "the brightness setting, except it's meant to be a temporary setting"]
@@ -2656,13 +2475,12 @@ pub mod kde_output_device_v2 {
             #[doc = "on the display."]
             #[doc = "0 is the minimum dimming factor (not completely dark) and 10000"]
             #[doc = "means the output is not dimmed."]
-            async fn dimming(
+            fn dimming(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 multiplier: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_v2#{}.dimming({})",
                     object.id,
                     multiplier
@@ -2670,10 +2488,7 @@ pub mod kde_output_device_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(multiplier)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 26u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 26u16, payload, fds)
             }
         }
     }
@@ -2714,14 +2529,13 @@ pub mod kde_output_device_v2 {
             #[doc = "hardware units of the output device. This is not necessarily the same as"]
             #[doc = "the output size in the global compositor space. For instance, the output"]
             #[doc = "may be scaled or transformed."]
-            async fn size(
+            fn size(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_mode_v2#{}.size({}, {})",
                     object.id,
                     width,
@@ -2731,57 +2545,36 @@ pub mod kde_output_device_v2 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event describes the mode's fixed vertical refresh rate. It is only"]
             #[doc = "sent if the mode has a fixed refresh rate."]
-            async fn refresh(
+            fn refresh(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 refresh: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_device_mode_v2#{}.refresh({})",
                     object.id,
                     refresh
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(refresh).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event advertises this mode as preferred."]
-            async fn preferred(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_mode_v2#{}.preferred()", object.id,);
+            fn preferred(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_mode_v2#{}.preferred()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "The compositor will destroy the object immediately after sending this"]
             #[doc = "event, so it will become invalid and the client should release any"]
             #[doc = "resources associated with it."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_device_mode_v2#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_device_mode_v2#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -3627,40 +3420,25 @@ pub mod kde_output_management_v2 {
             ) -> crate::server::Result<()>;
             #[doc = "Sent after the server has successfully applied the changes."]
             #[doc = "."]
-            async fn applied(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_configuration_v2#{}.applied()", object.id,);
+            fn applied(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_configuration_v2#{}.applied()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent if the server rejects the changes or failed to apply them."]
-            async fn failed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_configuration_v2#{}.failed()", object.id,);
+            fn failed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_configuration_v2#{}.failed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Describes why applying the output configuration failed. Is only"]
             #[doc = "sent before the failure event."]
-            async fn failure_reason(
+            fn failure_reason(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 reason: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_configuration_v2#{}.failure_reason(\"{}\")",
                     object.id,
                     reason
@@ -3668,10 +3446,7 @@ pub mod kde_output_management_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(reason))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -3722,13 +3497,12 @@ pub mod kde_output_order_v1 {
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
             #[doc = "Specifies the output identified by their wl_output.name."]
-            async fn output(
+            fn output(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output_name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_output_order_v1#{}.output(\"{}\")",
                     object.id,
                     output_name
@@ -3736,23 +3510,13 @@ pub mod kde_output_order_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(output_name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Specifies that the output list is complete. On the next output event, a new list begins."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> kde_output_order_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> kde_output_order_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -3803,13 +3567,12 @@ pub mod kde_primary_output_v1 {
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
             #[doc = "Specifies which output is the primary one identified by their uuid. See kde_output_device_v2 uuid event for more information about it."]
-            async fn primary_output(
+            fn primary_output(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output_name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> kde_primary_output_v1#{}.primary_output(\"{}\")",
                     object.id,
                     output_name
@@ -3817,10 +3580,7 @@ pub mod kde_primary_output_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(output_name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -4170,14 +3930,13 @@ pub mod keystate {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn state_changed(
+            fn state_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 key: u32,
                 state: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_keystate#{}.state_changed({}, {})",
                     object.id,
                     key,
@@ -4187,10 +3946,7 @@ pub mod keystate {
                     .put_uint(key)
                     .put_uint(state)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -4284,14 +4040,13 @@ pub mod org_kde_plasma_virtual_desktop {
                 client: &mut crate::server::Client,
                 desktop_id: String,
             ) -> crate::server::Result<()>;
-            async fn desktop_created(
+            fn desktop_created(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 desktop_id: String,
                 position: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop_management#{}.desktop_created(\"{}\", {})",
                     object.id,
                     desktop_id,
@@ -4301,18 +4056,14 @@ pub mod org_kde_plasma_virtual_desktop {
                     .put_string(Some(desktop_id))
                     .put_uint(position)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn desktop_removed(
+            fn desktop_removed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 desktop_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop_management#{}.desktop_removed(\"{}\")",
                     object.id,
                     desktop_id
@@ -4320,47 +4071,29 @@ pub mod org_kde_plasma_virtual_desktop {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(desktop_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is sent after all other properties has been"]
             #[doc = "sent after binding to the desktop manager object and after any"]
             #[doc = "other property changes done after that. This allows"]
             #[doc = "changes to the org_kde_plasma_virtual_desktop_management properties to be seen as"]
             #[doc = "atomic, even if they happen via multiple events."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop_management#{}.done()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
-            async fn rows(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                rows: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn rows(&self, object: &crate::server::Object, rows: u32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop_management#{}.rows({})",
                     object.id,
                     rows
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(rows).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -4404,13 +4137,12 @@ pub mod org_kde_plasma_virtual_desktop {
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
             #[doc = "The format of the id is decided by the compositor implementation. A desktop id univocally identifies a virtual desktop and must be guaranteed to never exist two desktops with the same id. The format of the string id is up to the server implementation."]
-            async fn desktop_id(
+            fn desktop_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 desktop_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop#{}.desktop_id(\"{}\")",
                     object.id,
                     desktop_id
@@ -4418,18 +4150,10 @@ pub mod org_kde_plasma_virtual_desktop {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(desktop_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn name(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn name(&self, object: &crate::server::Object, name: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop#{}.name(\"{}\")",
                     object.id,
                     name
@@ -4437,74 +4161,43 @@ pub mod org_kde_plasma_virtual_desktop {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "The desktop will be the new \"current\" desktop of the system. The server may support either one virtual desktop active at a time, or other combinations such as one virtual desktop active per screen."]
             #[doc = "Windows associated to this virtual desktop will be shown."]
-            async fn activated(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn activated(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop#{}.activated()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Windows that were associated only to this desktop will be hidden."]
-            async fn deactivated(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn deactivated(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_virtual_desktop#{}.deactivated()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is sent after all other properties has been"]
             #[doc = "sent after binding to the desktop object and after any"]
             #[doc = "other property changes done after that. This allows"]
             #[doc = "changes to the org_kde_plasma_virtual_desktop properties to be seen as"]
             #[doc = "atomic, even if they happen via multiple events."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_virtual_desktop#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_virtual_desktop#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This virtual desktop has just been removed by the server:"]
             #[doc = "All windows will lose the association to this desktop."]
-            async fn removed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_virtual_desktop#{}.removed()", object.id,);
+            fn removed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_virtual_desktop#{}.removed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -4901,33 +4594,19 @@ pub mod outputmanagement {
             ) -> crate::server::Result<()>;
             #[doc = "Sent after the server has successfully applied the changes."]
             #[doc = "."]
-            async fn applied(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn applied(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputconfiguration#{}.applied()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent if the server rejects the changes or failed to apply them."]
-            async fn failed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_outputconfiguration#{}.failed()", object.id,);
+            fn failed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_outputconfiguration#{}.failed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -5142,10 +4821,9 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = "The geometry event describes geometric properties of the output."]
             #[doc = "The event is sent when binding to the output object and whenever"]
             #[doc = "any of the properties change."]
-            async fn geometry(
+            fn geometry(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 physical_width: i32,
@@ -5154,8 +4832,8 @@ pub mod org_kde_kwin_outputdevice {
                 make: String,
                 model: String,
                 transform: i32,
-            ) -> crate::server::Result<()> {
-                tracing :: debug ! ("-> org_kde_kwin_outputdevice#{}.geometry({}, {}, {}, {}, {}, \"{}\", \"{}\", {})" , object . id , x , y , physical_width , physical_height , subpixel , make , model , transform);
+            ) -> crate::wire::Message {
+                tracing :: trace ! ("-> org_kde_kwin_outputdevice#{}.geometry({}, {}, {}, {}, {}, \"{}\", \"{}\", {})" , object . id , x , y , physical_width , physical_height , subpixel , make , model , transform);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_int(x)
                     .put_int(y)
@@ -5166,10 +4844,7 @@ pub mod org_kde_kwin_outputdevice {
                     .put_string(Some(model))
                     .put_int(transform)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "The mode event describes an available mode for the output."]
             #[doc = ""]
@@ -5192,17 +4867,16 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = ""]
             #[doc = "The id can be used to refer to a mode when calling set_mode on an"]
             #[doc = "org_kde_kwin_outputconfiguration object."]
-            async fn mode(
+            fn mode(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 flags: u32,
                 width: i32,
                 height: i32,
                 refresh: i32,
                 mode_id: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.mode({}, {}, {}, {}, {})",
                     object.id,
                     flags,
@@ -5218,27 +4892,17 @@ pub mod org_kde_kwin_outputdevice {
                     .put_int(refresh)
                     .put_int(mode_id)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is sent after all other properties have been"]
             #[doc = "sent on binding to the output object as well as after any"]
             #[doc = "other output property change have been applied later on."]
             #[doc = "This allows to see changes to the output properties as atomic,"]
             #[doc = "even if multiple events successively announce them."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_kwin_outputdevice#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_kwin_outputdevice#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event contains scaling geometry information"]
             #[doc = "that is not in the geometry event. It may be sent after"]
@@ -5258,22 +4922,14 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = "the scale of the output. That way the compositor can"]
             #[doc = "avoid scaling the surface, and the client can supply"]
             #[doc = "a higher detail image."]
-            async fn scale(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                factor: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn scale(&self, object: &crate::server::Object, factor: i32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.scale({})",
                     object.id,
                     factor
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(factor).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "The edid event encapsulates the EDID data for the outputdevice."]
             #[doc = ""]
@@ -5281,13 +4937,8 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = "data may be empty, in which case this event is sent anyway."]
             #[doc = "If the EDID information is empty, you can fall back to the name"]
             #[doc = "et al. properties of the outputdevice."]
-            async fn edid(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                raw: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn edid(&self, object: &crate::server::Object, raw: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.edid(\"{}\")",
                     object.id,
                     raw
@@ -5295,43 +4946,31 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(raw))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "The enabled event notifies whether this output is currently"]
             #[doc = "enabled and used for displaying content by the server."]
             #[doc = "The event is sent when binding to the output object and"]
             #[doc = "whenever later on an output changes its state by becoming"]
             #[doc = "enabled or disabled."]
-            async fn enabled(
+            fn enabled(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 enabled: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.enabled({})",
                     object.id,
                     enabled
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(enabled).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "The uuid can be used to identify the output. It's controlled by"]
             #[doc = "the server entirely. The server should make sure the uuid is"]
             #[doc = "persistent across restarts. An empty uuid is considered invalid."]
-            async fn uuid(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                uuid: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn uuid(&self, object: &crate::server::Object, uuid: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.uuid(\"{}\")",
                     object.id,
                     uuid
@@ -5339,10 +4978,7 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(uuid))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "This event contains scaling geometry information"]
             #[doc = "that is not in the geometry event. It may be sent after"]
@@ -5365,22 +5001,18 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = ""]
             #[doc = "wl_output will keep the output scale as an integer. In every situation except"]
             #[doc = "configuring the window manager you want to use that."]
-            async fn scalef(
+            fn scalef(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 factor: crate::wire::Fixed,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.scalef({})",
                     object.id,
                     factor
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_fixed(factor).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "Describes the color intensity profile of the output."]
             #[doc = "Commonly used for gamma/color correction."]
@@ -5389,15 +5021,14 @@ pub mod org_kde_kwin_outputdevice {
             #[doc = "For example on 8bit screens there are 256 of them."]
             #[doc = ""]
             #[doc = "The array elements are unsigned 16bit integers."]
-            async fn colorcurves(
+            fn colorcurves(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 red: Vec<u8>,
                 green: Vec<u8>,
                 blue: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.colorcurves(array[{}], array[{}], array[{}])",
                     object.id,
                     red.len(),
@@ -5409,19 +5040,15 @@ pub mod org_kde_kwin_outputdevice {
                     .put_array(green)
                     .put_array(blue)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "Serial ID of the monitor, sent on startup before the first done event."]
-            async fn serial_number(
+            fn serial_number(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial_number: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.serial_number(\"{}\")",
                     object.id,
                     serial_number
@@ -5429,19 +5056,15 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(serial_number))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "EISA ID of the monitor, sent on startup before the first done event."]
-            async fn eisa_id(
+            fn eisa_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 eisa_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.eisa_id(\"{}\")",
                     object.id,
                     eisa_id
@@ -5449,20 +5072,16 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(eisa_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "What capabilities this device has, sent on startup before the first"]
             #[doc = "done event."]
-            async fn capabilities(
+            fn capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 flags: Capability,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.capabilities({})",
                     object.id,
                     flags
@@ -5470,20 +5089,16 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(flags.bits())
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "Overscan value of the monitor in percent, sent on startup before the"]
             #[doc = "first done event."]
-            async fn overscan(
+            fn overscan(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 overscan: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.overscan({})",
                     object.id,
                     overscan
@@ -5491,20 +5106,16 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(overscan)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
             #[doc = "What policy the compositor will employ regarding its use of variable"]
             #[doc = "refresh rate."]
-            async fn vrr_policy(
+            fn vrr_policy(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 vrr_policy: VrrPolicy,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_outputdevice#{}.vrr_policy({})",
                     object.id,
                     vrr_policy
@@ -5512,10 +5123,7 @@ pub mod org_kde_kwin_outputdevice {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(vrr_policy as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 13u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 13u16, payload, fds)
             }
         }
     }
@@ -5994,36 +5602,28 @@ pub mod plasma_shell {
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
             #[doc = "An auto-hiding panel got hidden by the compositor."]
-            async fn auto_hidden_panel_hidden(
+            fn auto_hidden_panel_hidden(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_surface#{}.auto_hidden_panel_hidden()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "An auto-hiding panel got shown by the compositor."]
-            async fn auto_hidden_panel_shown(
+            fn auto_hidden_panel_shown(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_surface#{}.auto_hidden_panel_shown()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -6234,71 +5834,54 @@ pub mod plasma_window_management {
             #[doc = "or left."]
             #[doc = ""]
             #[doc = "On binding the interface the current state is sent."]
-            async fn show_desktop_changed(
+            fn show_desktop_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 state: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.show_desktop_changed({})",
                     object.id,
                     state
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(state).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event will be sent immediately after a window is mapped."]
-            async fn window(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                id: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn window(&self, object: &crate::server::Object, id: u32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.window({})",
                     object.id,
                     id
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(id).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event will be sent when stacking order changed and on bind."]
             #[doc = ""]
             #[doc = "With version 17 this event is deprecated and will no longer be sent."]
-            async fn stacking_order_changed(
+            fn stacking_order_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 ids: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.stacking_order_changed(array[{}])",
                     object.id,
                     ids.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(ids).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event will be sent when stacking order changed and on bind."]
             #[doc = ""]
             #[doc = "With version 17 this event is deprecated and will no longer be sent."]
-            async fn stacking_order_uuid_changed(
+            fn stacking_order_uuid_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 uuids: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.stacking_order_uuid_changed(\"{}\")",
                     object.id,
                     uuids
@@ -6306,20 +5889,16 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(uuids))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event will be sent immediately after a window is mapped."]
-            async fn window_with_uuid(
+            fn window_with_uuid(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: u32,
                 uuid: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.window_with_uuid({}, \"{}\")",
                     object.id,
                     id,
@@ -6329,26 +5908,19 @@ pub mod plasma_window_management {
                     .put_uint(id)
                     .put_string(Some(uuid))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event will be sent when stacking order changed."]
-            async fn stacking_order_changed_2(
+            fn stacking_order_changed_2(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window_management#{}.stacking_order_changed_2()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -6655,13 +6227,12 @@ pub mod plasma_window_management {
                 output: crate::wire::ObjectId,
             ) -> crate::server::Result<()>;
             #[doc = "This event will be sent as soon as the window title is changed."]
-            async fn title_changed(
+            fn title_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 title: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.title_changed(\"{}\")",
                     object.id,
                     title
@@ -6669,20 +6240,16 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(title))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event will be sent as soon as the application"]
             #[doc = "identifier is changed."]
-            async fn app_id_changed(
+            fn app_id_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 app_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.app_id_changed(\"{}\")",
                     object.id,
                     app_id
@@ -6690,61 +6257,49 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(app_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event will be sent as soon as the window state changes."]
             #[doc = ""]
             #[doc = "Values for state argument are described by org_kde_plasma_window_management.state."]
-            async fn state_changed(
+            fn state_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 flags: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.state_changed({})",
                     object.id,
                     flags
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(flags).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "DEPRECATED: use virtual_desktop_entered and virtual_desktop_left instead"]
             #[doc = "This event will be sent when a window is moved to another"]
             #[doc = "virtual desktop."]
             #[doc = ""]
             #[doc = "It is not sent if it becomes visible on all virtual desktops though."]
-            async fn virtual_desktop_changed(
+            fn virtual_desktop_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 number: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.virtual_desktop_changed({})",
                     object.id,
                     number
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(number).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event will be sent whenever the themed icon name changes. May be null."]
-            async fn themed_icon_name_changed(
+            fn themed_icon_name_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.themed_icon_name_changed(\"{}\")",
                     object.id,
                     name
@@ -6752,51 +6307,33 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event will be sent immediately after the window is closed"]
             #[doc = "and its surface is unmapped."]
-            async fn unmapped(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_window#{}.unmapped()", object.id,);
+            fn unmapped(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_window#{}.unmapped()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "This event will be sent immediately after all initial state been sent to the client."]
             #[doc = "If the Plasma window is already unmapped, the unmapped event will be sent before the"]
             #[doc = "initial_state event."]
-            async fn initial_state(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_window#{}.initial_state()", object.id,);
+            fn initial_state(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_window#{}.initial_state()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "This event will be sent whenever the parent window of this org_kde_plasma_window changes."]
             #[doc = "The passed parent is another org_kde_plasma_window and this org_kde_plasma_window is a"]
             #[doc = "transient window to the parent window. If the parent argument is null, this"]
             #[doc = "org_kde_plasma_window does not have a parent window."]
-            async fn parent_window(
+            fn parent_window(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 parent: Option<crate::wire::ObjectId>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.parent_window({})",
                     object.id,
                     parent
@@ -6806,23 +6343,19 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(parent)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "This event will be sent whenever the window geometry of this org_kde_plasma_window changes."]
             #[doc = "The coordinates are in absolute coordinates of the windowing system."]
-            async fn geometry(
+            fn geometry(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.geometry({}, {}, {}, {})",
                     object.id,
                     x,
@@ -6836,54 +6369,39 @@ pub mod plasma_window_management {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "This event will be sent whenever the icon of the window changes, but there is no themed"]
             #[doc = "icon name. Common examples are Xwayland windows which have a pixmap based icon."]
             #[doc = ""]
             #[doc = "The client can request the icon using get_icon."]
-            async fn icon_changed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_window#{}.icon_changed()", object.id,);
+            fn icon_changed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_window#{}.icon_changed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "This event will be sent when the compositor has set the process id this window belongs to."]
             #[doc = "This should be set once before the initial_state is sent."]
-            async fn pid_changed(
+            fn pid_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 pid: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.pid_changed({})",
                     object.id,
                     pid
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(pid).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "This event will be sent when the window has entered a new virtual desktop. The window can be on more than one desktop, or none: then is considered on all of them."]
-            async fn virtual_desktop_entered(
+            fn virtual_desktop_entered(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.virtual_desktop_entered(\"{}\")",
                     object.id,
                     id
@@ -6891,20 +6409,16 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "This event will be sent when the window left a virtual desktop. If the window leaves all desktops, it can be considered on all."]
             #[doc = "If the window gets manually added on all desktops, the server has to send virtual_desktop_left for every previous desktop it was in for the window to be really considered on all desktops."]
-            async fn virtual_desktop_left(
+            fn virtual_desktop_left(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 is: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.virtual_desktop_left(\"{}\")",
                     object.id,
                     is
@@ -6912,21 +6426,17 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(is))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
             #[doc = "This event will be sent after the application menu"]
             #[doc = "for the window has changed."]
-            async fn application_menu(
+            fn application_menu(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 service_name: String,
                 object_path: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.application_menu(\"{}\", \"{}\")",
                     object.id,
                     service_name,
@@ -6936,19 +6446,15 @@ pub mod plasma_window_management {
                     .put_string(Some(service_name))
                     .put_string(Some(object_path))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 13u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 13u16, payload, fds)
             }
             #[doc = "This event will be sent when the window has entered an activity. The window can be on more than one activity, or none: then is considered on all of them."]
-            async fn activity_entered(
+            fn activity_entered(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.activity_entered(\"{}\")",
                     object.id,
                     id
@@ -6956,20 +6462,16 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 14u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 14u16, payload, fds)
             }
             #[doc = "This event will be sent when the window left an activity. If the window leaves all activities, it will be considered on all."]
             #[doc = "If the window gets manually added on all activities, the server has to send activity_left for every previous activity it was in for the window to be really considered on all activities."]
-            async fn activity_left(
+            fn activity_left(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.activity_left(\"{}\")",
                     object.id,
                     id
@@ -6977,20 +6479,16 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 15u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 15u16, payload, fds)
             }
             #[doc = "This event will be sent when the X11 resource name of the window has changed."]
             #[doc = "This is only set for XWayland windows."]
-            async fn resource_name_changed(
+            fn resource_name_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 resource_name: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.resource_name_changed(\"{}\")",
                     object.id,
                     resource_name
@@ -6998,23 +6496,19 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(resource_name))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 16u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 16u16, payload, fds)
             }
             #[doc = "This event will be sent whenever the window geometry of this org_kde_plasma_window changes."]
             #[doc = "The coordinates are in absolute coordinates of the windowing system."]
-            async fn client_geometry(
+            fn client_geometry(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_window#{}.client_geometry({}, {}, {}, {})",
                     object.id,
                     x,
@@ -7028,10 +6522,7 @@ pub mod plasma_window_management {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 17u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 17u16, payload, fds)
             }
         }
     }
@@ -7081,13 +6572,12 @@ pub mod plasma_window_management {
             #[doc = "Will be issued when an app is set to be activated. It offers"]
             #[doc = "an instance of org_kde_plasma_activation that will tell us the app_id"]
             #[doc = "and the extent of the activation."]
-            async fn activation(
+            fn activation(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_activation_feedback#{}.activation({})",
                     object.id,
                     id
@@ -7095,10 +6585,7 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -7140,13 +6627,12 @@ pub mod plasma_window_management {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn app_id(
+            fn app_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 app_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_activation#{}.app_id(\"{}\")",
                     object.id,
                     app_id
@@ -7154,22 +6640,12 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(app_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_activation#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_activation#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -7201,13 +6677,8 @@ pub mod plasma_window_management {
                     _ => Err(crate::server::error::Error::UnknownOpcode),
                 }
             }
-            async fn window(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                uuid: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn window(&self, object: &crate::server::Object, uuid: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_plasma_stacking_order#{}.window(\"{}\")",
                     object.id,
                     uuid
@@ -7215,22 +6686,12 @@ pub mod plasma_window_management {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(uuid))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> org_kde_plasma_stacking_order#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> org_kde_plasma_stacking_order#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
         }
     }
@@ -7299,14 +6760,13 @@ pub mod remote_access {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn buffer_ready(
+            fn buffer_ready(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 id: i32,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_remote_access_manager#{}.buffer_ready({}, {})",
                     object.id,
                     id,
@@ -7316,10 +6776,7 @@ pub mod remote_access {
                     .put_int(id)
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -7359,17 +6816,16 @@ pub mod remote_access {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn gbm_handle(
+            fn gbm_handle(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 fd: rustix::fd::OwnedFd,
                 width: u32,
                 height: u32,
                 stride: u32,
                 format: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_remote_buffer#{}.gbm_handle({}, {}, {}, {}, {})",
                     object.id,
                     fd.as_raw_fd(),
@@ -7385,10 +6841,7 @@ pub mod remote_access {
                     .put_uint(stride)
                     .put_uint(format)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -7610,22 +7063,18 @@ pub mod server_decoration {
             #[doc = "request_mode is requested."]
             #[doc = ""]
             #[doc = "The server may change the default mode at any time."]
-            async fn default_mode(
+            fn default_mode(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 mode: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_server_decoration_manager#{}.default_mode({})",
                     object.id,
                     mode
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(mode).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -7721,22 +7170,14 @@ pub mod server_decoration {
             #[doc = "The server may emit this event at any time. In this case the client can"]
             #[doc = "again request a different mode. It's the responsibility of the server to"]
             #[doc = "prevent a feedback loop."]
-            async fn mode(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                mode: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn mode(&self, object: &crate::server::Object, mode: u32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> org_kde_kwin_server_decoration#{}.mode({})",
                     object.id,
                     mode
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(mode).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -8464,31 +7905,26 @@ pub mod surface_extension {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn onscreen_visibility(
+            fn onscreen_visibility(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 visible: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> qt_extended_surface#{}.onscreen_visibility({})",
                     object.id,
                     visible
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(visible).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn set_generic_property(
+            fn set_generic_property(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 name: String,
                 value: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> qt_extended_surface#{}.set_generic_property(\"{}\", array[{}])",
                     object.id,
                     name,
@@ -8498,22 +7934,12 @@ pub mod surface_extension {
                     .put_string(Some(name))
                     .put_array(value)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
-            async fn close(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> qt_extended_surface#{}.close()", object.id,);
+            fn close(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> qt_extended_surface#{}.close()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -9011,14 +8437,13 @@ pub mod text_input_unstable_v2 {
             #[doc = ""]
             #[doc = "When the seat has the keyboard capability the text-input focus follows"]
             #[doc = "the keyboard focus."]
-            async fn enter(
+            fn enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.enter({}, {})",
                     object.id,
                     serial,
@@ -9028,10 +8453,7 @@ pub mod text_input_unstable_v2 {
                     .put_uint(serial)
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Notification that this seat's text-input focus is no longer on"]
             #[doc = "a certain surface."]
@@ -9041,14 +8463,13 @@ pub mod text_input_unstable_v2 {
             #[doc = ""]
             #[doc = "When the seat has the keyboard capability the text-input focus follows"]
             #[doc = "the keyboard focus."]
-            async fn leave(
+            fn leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.leave({}, {})",
                     object.id,
                     serial,
@@ -9058,10 +8479,7 @@ pub mod text_input_unstable_v2 {
                     .put_uint(serial)
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Notification that the visibility of the input panel (virtual keyboard)"]
             #[doc = "changed."]
@@ -9072,17 +8490,16 @@ pub mod text_input_unstable_v2 {
             #[doc = ""]
             #[doc = "That can be used to make sure widgets are visible and not covered by"]
             #[doc = "a virtual keyboard."]
-            async fn input_panel_state(
+            fn input_panel_state(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 state: InputPanelVisibility,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.input_panel_state({}, {}, {}, {}, {})",
                     object.id,
                     state,
@@ -9098,10 +8515,7 @@ pub mod text_input_unstable_v2 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Notify when a new composing text (pre-edit) should be set around the"]
             #[doc = "current cursor position. Any previously set composing text should"]
@@ -9112,14 +8526,13 @@ pub mod text_input_unstable_v2 {
             #[doc = ""]
             #[doc = "The text input should also handle all preedit_style and preedit_cursor"]
             #[doc = "events occurring directly before preedit_string."]
-            async fn preedit_string(
+            fn preedit_string(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 text: String,
                 commit: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.preedit_string(\"{}\", \"{}\")",
                     object.id,
                     text,
@@ -9129,10 +8542,7 @@ pub mod text_input_unstable_v2 {
                     .put_string(Some(text))
                     .put_string(Some(commit))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "Sets styling information on composing text. The style is applied for"]
             #[doc = "length bytes from index relative to the beginning of the composing"]
@@ -9140,15 +8550,14 @@ pub mod text_input_unstable_v2 {
             #[doc = "text by sending multiple preedit_styling events."]
             #[doc = ""]
             #[doc = "This event is handled as part of a following preedit_string event."]
-            async fn preedit_styling(
+            fn preedit_styling(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: u32,
                 length: u32,
                 style: PreeditStyle,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.preedit_styling({}, {}, {})",
                     object.id,
                     index,
@@ -9160,10 +8569,7 @@ pub mod text_input_unstable_v2 {
                     .put_uint(length)
                     .put_uint(style as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "Sets the cursor position inside the composing text (as byte"]
             #[doc = "offset) relative to the start of the composing text. When index is a"]
@@ -9173,22 +8579,18 @@ pub mod text_input_unstable_v2 {
             #[doc = "the composing text by default."]
             #[doc = ""]
             #[doc = "This event is handled as part of a following preedit_string event."]
-            async fn preedit_cursor(
+            fn preedit_cursor(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.preedit_cursor({})",
                     object.id,
                     index
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(index).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "Notify when text should be inserted into the editor widget. The text to"]
             #[doc = "commit could be either just a single character after a key press or the"]
@@ -9197,13 +8599,12 @@ pub mod text_input_unstable_v2 {
             #[doc = "the input cursor should be moved (see cursor_position)."]
             #[doc = ""]
             #[doc = "Any previously set composing text should be removed."]
-            async fn commit_string(
+            fn commit_string(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 text: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.commit_string(\"{}\")",
                     object.id,
                     text
@@ -9211,10 +8612,7 @@ pub mod text_input_unstable_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(text))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "Notify when the cursor or anchor position should be modified."]
             #[doc = ""]
@@ -9222,14 +8620,13 @@ pub mod text_input_unstable_v2 {
             #[doc = "event."]
             #[doc = ""]
             #[doc = "The text between anchor and index should be selected."]
-            async fn cursor_position(
+            fn cursor_position(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: i32,
                 anchor: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.cursor_position({}, {})",
                     object.id,
                     index,
@@ -9239,10 +8636,7 @@ pub mod text_input_unstable_v2 {
                     .put_int(index)
                     .put_int(anchor)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "Notify when the text around the current cursor position should be"]
             #[doc = "deleted. BeforeLength and afterLength is the length (in bytes) of text"]
@@ -9251,14 +8645,13 @@ pub mod text_input_unstable_v2 {
             #[doc = ""]
             #[doc = "This event should be handled as part of a following commit_string"]
             #[doc = "or preedit_string event."]
-            async fn delete_surrounding_text(
+            fn delete_surrounding_text(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 before_length: u32,
                 after_length: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.delete_surrounding_text({}, {})",
                     object.id,
                     before_length,
@@ -9268,30 +8661,23 @@ pub mod text_input_unstable_v2 {
                     .put_uint(before_length)
                     .put_uint(after_length)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "Transfer an array of 0-terminated modifiers names. The position in"]
             #[doc = "the array is the index of the modifier as used in the modifiers"]
             #[doc = "bitmask in the keysym event."]
-            async fn modifiers_map(
+            fn modifiers_map(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 map: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.modifiers_map(array[{}])",
                     object.id,
                     map.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(map).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "Notify when a key event was sent. Key events should not be used"]
             #[doc = "for normal text input operations, which should be done with"]
@@ -9299,16 +8685,15 @@ pub mod text_input_unstable_v2 {
             #[doc = "the wl_keyboard key event convention. Sym is a XKB keysym, state a"]
             #[doc = "wl_keyboard key_state. Modifiers are a mask for effective modifiers"]
             #[doc = "(where the modifier indices are set by the modifiers_map event)"]
-            async fn keysym(
+            fn keysym(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 time: u32,
                 sym: u32,
                 state: u32,
                 modifiers: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.keysym({}, {}, {}, {})",
                     object.id,
                     time,
@@ -9322,20 +8707,16 @@ pub mod text_input_unstable_v2 {
                     .put_uint(state)
                     .put_uint(modifiers)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "Sets the language of the input text. The \"language\" argument is a RFC-3066"]
             #[doc = "format language tag."]
-            async fn language(
+            fn language(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 language: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.language(\"{}\")",
                     object.id,
                     language
@@ -9343,23 +8724,19 @@ pub mod text_input_unstable_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(language))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "Sets the text direction of input text."]
             #[doc = ""]
             #[doc = "It is mainly needed for showing input cursor on correct side of the"]
             #[doc = "editor when there is no input yet done and making sure neutral"]
             #[doc = "direction text is laid out properly."]
-            async fn text_direction(
+            fn text_direction(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 direction: TextDirection,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.text_direction({})",
                     object.id,
                     direction
@@ -9367,22 +8744,18 @@ pub mod text_input_unstable_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(direction as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
             #[doc = "Configure what amount of surrounding text is expected by the"]
             #[doc = "input method. The surrounding text will be sent in the"]
             #[doc = "set_surrounding_text request on the following state information updates."]
-            async fn configure_surrounding_text(
+            fn configure_surrounding_text(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 before_cursor: i32,
                 after_cursor: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.configure_surrounding_text({}, {})",
                     object.id,
                     before_cursor,
@@ -9392,23 +8765,19 @@ pub mod text_input_unstable_v2 {
                     .put_int(before_cursor)
                     .put_int(after_cursor)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 13u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 13u16, payload, fds)
             }
             #[doc = "The input method changed on compositor side, which invalidates all"]
             #[doc = "current state information. New state information should be sent from"]
             #[doc = "the client via state requests (set_surrounding_text,"]
             #[doc = "set_content_hint, ...) and update_state."]
-            async fn input_method_changed(
+            fn input_method_changed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 flags: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zwp_text_input_v2#{}.input_method_changed({}, {})",
                     object.id,
                     serial,
@@ -9418,10 +8787,7 @@ pub mod text_input_unstable_v2 {
                     .put_uint(serial)
                     .put_uint(flags)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 14u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 14u16, payload, fds)
             }
         }
     }
@@ -9943,73 +9309,54 @@ pub mod text {
             ) -> crate::server::Result<()>;
             #[doc = "Notify the text-input object when it received focus. Typically in"]
             #[doc = "response to an activate request."]
-            async fn enter(
+            fn enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 surface: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wl_text_input#{}.enter({})", object.id, surface);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> wl_text_input#{}.enter({})", object.id, surface);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(surface))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Notify the text-input object when it lost focus. Either in response"]
             #[doc = "to a deactivate request or when the assigned surface lost focus or was"]
             #[doc = "destroyed."]
-            async fn leave(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wl_text_input#{}.leave()", object.id,);
+            fn leave(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> wl_text_input#{}.leave()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Transfer an array of 0-terminated modifiers names. The position in"]
             #[doc = "the array is the index of the modifier as used in the modifiers"]
             #[doc = "bitmask in the keysym event."]
-            async fn modifiers_map(
+            fn modifiers_map(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 map: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.modifiers_map(array[{}])",
                     object.id,
                     map.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(map).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Notify when the visibility state of the input panel changed."]
-            async fn input_panel_state(
+            fn input_panel_state(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 state: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.input_panel_state({})",
                     object.id,
                     state
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(state).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "Notify when a new composing text (pre-edit) should be set around the"]
             #[doc = "current cursor position. Any previously set composing text should"]
@@ -10020,15 +9367,14 @@ pub mod text {
             #[doc = ""]
             #[doc = "The text input should also handle all preedit_style and preedit_cursor"]
             #[doc = "events occurring directly before preedit_string."]
-            async fn preedit_string(
+            fn preedit_string(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 text: String,
                 commit: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.preedit_string({}, \"{}\", \"{}\")",
                     object.id,
                     serial,
@@ -10040,10 +9386,7 @@ pub mod text {
                     .put_string(Some(text))
                     .put_string(Some(commit))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "Sets styling information on composing text. The style is applied for"]
             #[doc = "length bytes from index relative to the beginning of the composing"]
@@ -10052,15 +9395,14 @@ pub mod text {
             #[doc = "events."]
             #[doc = ""]
             #[doc = "This event is handled as part of a following preedit_string event."]
-            async fn preedit_styling(
+            fn preedit_styling(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: u32,
                 length: u32,
                 style: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.preedit_styling({}, {}, {})",
                     object.id,
                     index,
@@ -10072,28 +9414,21 @@ pub mod text {
                     .put_uint(length)
                     .put_uint(style)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "Sets the cursor position inside the composing text (as byte"]
             #[doc = "offset) relative to the start of the composing text. When index is a"]
             #[doc = "negative number no cursor is shown."]
             #[doc = ""]
             #[doc = "This event is handled as part of a following preedit_string event."]
-            async fn preedit_cursor(
+            fn preedit_cursor(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> wl_text_input#{}.preedit_cursor({})", object.id, index);
+            ) -> crate::wire::Message {
+                tracing::trace!("-> wl_text_input#{}.preedit_cursor({})", object.id, index);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_int(index).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "Notify when text should be inserted into the editor widget. The text to"]
             #[doc = "commit could be either just a single character after a key press or the"]
@@ -10102,14 +9437,13 @@ pub mod text {
             #[doc = "the input cursor should be moved (see cursor_position)."]
             #[doc = ""]
             #[doc = "Any previously set composing text should be removed."]
-            async fn commit_string(
+            fn commit_string(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 text: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.commit_string({}, \"{}\")",
                     object.id,
                     serial,
@@ -10119,23 +9453,19 @@ pub mod text {
                     .put_uint(serial)
                     .put_string(Some(text))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "Notify when the cursor or anchor position should be modified."]
             #[doc = ""]
             #[doc = "This event should be handled as part of a following commit_string"]
             #[doc = "event."]
-            async fn cursor_position(
+            fn cursor_position(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: i32,
                 anchor: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.cursor_position({}, {})",
                     object.id,
                     index,
@@ -10145,10 +9475,7 @@ pub mod text {
                     .put_int(index)
                     .put_int(anchor)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "Notify when the text around the current cursor position should be"]
             #[doc = "deleted."]
@@ -10158,14 +9485,13 @@ pub mod text {
             #[doc = ""]
             #[doc = "This event should be handled as part of a following commit_string"]
             #[doc = "event."]
-            async fn delete_surrounding_text(
+            fn delete_surrounding_text(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 index: i32,
                 length: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.delete_surrounding_text({}, {})",
                     object.id,
                     index,
@@ -10175,10 +9501,7 @@ pub mod text {
                     .put_int(index)
                     .put_uint(length)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
             #[doc = "Notify when a key event was sent. Key events should not be used"]
             #[doc = "for normal text input operations, which should be done with"]
@@ -10186,17 +9509,16 @@ pub mod text {
             #[doc = "the wl_keyboard key event convention. Sym is a XKB keysym, state a"]
             #[doc = "wl_keyboard key_state. Modifiers are a mask for effective modifiers"]
             #[doc = "(where the modifier indices are set by the modifiers_map event)"]
-            async fn keysym(
+            fn keysym(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 time: u32,
                 sym: u32,
                 state: u32,
                 modifiers: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.keysym({}, {}, {}, {}, {})",
                     object.id,
                     serial,
@@ -10212,21 +9534,17 @@ pub mod text {
                     .put_uint(state)
                     .put_uint(modifiers)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 10u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 10u16, payload, fds)
             }
             #[doc = "Sets the language of the input text. The \"language\" argument is a RFC-3066"]
             #[doc = "format language tag."]
-            async fn language(
+            fn language(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 language: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.language({}, \"{}\")",
                     object.id,
                     serial,
@@ -10236,24 +9554,20 @@ pub mod text {
                     .put_uint(serial)
                     .put_string(Some(language))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 11u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 11u16, payload, fds)
             }
             #[doc = "Sets the text direction of input text."]
             #[doc = ""]
             #[doc = "It is mainly needed for showing input cursor on correct side of the"]
             #[doc = "editor when there is no input yet done and making sure neutral"]
             #[doc = "direction text is laid out properly."]
-            async fn text_direction(
+            fn text_direction(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 serial: u32,
                 direction: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> wl_text_input#{}.text_direction({}, {})",
                     object.id,
                     serial,
@@ -10263,10 +9577,7 @@ pub mod text {
                     .put_uint(serial)
                     .put_uint(direction)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 12u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 12u16, payload, fds)
             }
         }
     }
@@ -10735,45 +10046,29 @@ pub mod zkde_screencast_unstable_v1 {
                 object: &crate::server::Object,
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
-            async fn closed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn closed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zkde_screencast_stream_unstable_v1#{}.closed()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
-            async fn created(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                node: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn created(&self, object: &crate::server::Object, node: u32) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zkde_screencast_stream_unstable_v1#{}.created({})",
                     object.id,
                     node
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(node).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
-            async fn failed(
+            fn failed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 error: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zkde_screencast_stream_unstable_v1#{}.failed(\"{}\")",
                     object.id,
                     error
@@ -10781,10 +10076,7 @@ pub mod zkde_screencast_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(error))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }

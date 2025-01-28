@@ -118,22 +118,18 @@ pub mod cosmic_atspi_v1 {
                 client: &mut crate::server::Client,
             ) -> crate::server::Result<()>;
             #[doc = "Produces an fd that can be used with libei to monitor keyboard input."]
-            async fn key_events_eis(
+            fn key_events_eis(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 fd: rustix::fd::OwnedFd,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> cosmic_atspi_manager_v1#{}.key_events_eis({})",
                     object.id,
                     fd.as_raw_fd()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_fd(fd).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -680,13 +676,12 @@ pub mod cosmic_output_management_unstable_v1 {
             #[doc = "space multiplied by 1000 for additional precision."]
             #[doc = ""]
             #[doc = "It is only sent if the output is enabled."]
-            async fn scale_1000(
+            fn scale_1000(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 scale_1000: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_output_head_v1#{}.scale_1000({})",
                     object.id,
                     scale_1000
@@ -694,10 +689,7 @@ pub mod cosmic_output_management_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_int(scale_1000)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This events describes that the head is mirroring another."]
             #[doc = "In these cases `name` contains the unique name of the matching `zwlr_output_head_v1`."]
@@ -706,33 +698,28 @@ pub mod cosmic_output_management_unstable_v1 {
             #[doc = "For mirrored heads the `position`-event is meaningless."]
             #[doc = ""]
             #[doc = "It is only sent if the output is enabled."]
-            async fn mirroring(
+            fn mirroring(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 name: Option<String>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_output_head_v1#{}.mirroring(\"{}\")",
                     object.id,
                     name.as_ref().map_or("null".to_string(), |v| v.to_string())
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_string(name).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This events describes if adaptive_sync is available for this head."]
             #[doc = ""]
             #[doc = "It is only sent if the output is enabled."]
-            async fn adaptive_sync_available(
+            fn adaptive_sync_available(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 available: AdaptiveSyncAvailability,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_output_head_v1#{}.adaptive_sync_available({})",
                     object.id,
                     available
@@ -740,21 +727,17 @@ pub mod cosmic_output_management_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(available as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This events describes the adaptive_sync state of this head."]
             #[doc = ""]
             #[doc = "It is only sent if the output is enabled."]
-            async fn adaptive_sync_ext(
+            fn adaptive_sync_ext(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 state: AdaptiveSyncStateExt,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_output_head_v1#{}.adaptive_sync_ext({})",
                     object.id,
                     state
@@ -762,10 +745,7 @@ pub mod cosmic_output_management_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(state as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -884,20 +864,13 @@ pub mod cosmic_output_management_unstable_v1 {
             #[doc = "Upon receiving this event, the client should destroy this object."]
             #[doc = ""]
             #[doc = "The configration object becomes inert and any requests other than `destroy` will be ignored."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_output_configuration_v1#{}.finished()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
@@ -1113,17 +1086,16 @@ pub mod cosmic_overlap_notify_unstable_v1 {
             #[doc = "Compositors are free to update the overlapping area by sending additional"]
             #[doc = "`toplevel_enter` events for the same toplevel without sending `toplevel_leave`"]
             #[doc = "in between."]
-            async fn toplevel_enter(
+            fn toplevel_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 toplevel: crate::wire::ObjectId,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_overlap_notification_v1#{}.toplevel_enter({}, {}, {}, {}, {})",
                     object.id,
                     toplevel,
@@ -1139,22 +1111,18 @@ pub mod cosmic_overlap_notify_unstable_v1 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "A ext_foreign_toplevel_handle_v1 has left the surface area."]
             #[doc = ""]
             #[doc = "This event will be emitted once for every ext_foreign_toplevel_handle_v1"]
             #[doc = "representing this toplevel."]
-            async fn toplevel_leave(
+            fn toplevel_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 toplevel: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_overlap_notification_v1#{}.toplevel_leave({})",
                     object.id,
                     toplevel
@@ -1162,10 +1130,7 @@ pub mod cosmic_overlap_notify_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(toplevel))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "A zwlr_layer_surface_v1 has entered the surface area."]
             #[doc = ""]
@@ -1175,10 +1140,9 @@ pub mod cosmic_overlap_notify_unstable_v1 {
             #[doc = ""]
             #[doc = "The overlapping region is given surface-relative to the zwlr_layer_surface_v1"]
             #[doc = "used to create this notification object."]
-            async fn layer_enter(
+            fn layer_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 identifier: String,
                 namespace: String,
                 exclusive: u32,
@@ -1187,8 +1151,8 @@ pub mod cosmic_overlap_notify_unstable_v1 {
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing :: debug ! ("-> zcosmic_overlap_notification_v1#{}.layer_enter(\"{}\", \"{}\", {}, {}, {}, {}, {}, {})" , object . id , identifier , namespace , exclusive , layer , x , y , width , height);
+            ) -> crate::wire::Message {
+                tracing :: trace ! ("-> zcosmic_overlap_notification_v1#{}.layer_enter(\"{}\", \"{}\", {}, {}, {}, {}, {}, {})" , object . id , identifier , namespace , exclusive , layer , x , y , width , height);
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(identifier))
                     .put_string(Some(namespace))
@@ -1199,19 +1163,15 @@ pub mod cosmic_overlap_notify_unstable_v1 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "A zwlr_layer_surface_v1 has left the surface area."]
-            async fn layer_leave(
+            fn layer_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 identifier: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_overlap_notification_v1#{}.layer_leave(\"{}\")",
                     object.id,
                     identifier
@@ -1219,10 +1179,7 @@ pub mod cosmic_overlap_notify_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(identifier))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -1456,14 +1413,13 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "Provides the dimensions of the source image in buffer pixel coordinates."]
             #[doc = ""]
             #[doc = "The client must attach buffers that match this size."]
-            async fn buffer_size(
+            fn buffer_size(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 width: u32,
                 height: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_session_v2#{}.buffer_size({}, {})",
                     object.id,
                     width,
@@ -1473,31 +1429,24 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_uint(width)
                     .put_uint(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Provides the format that must be used for shared-memory buffers."]
             #[doc = ""]
             #[doc = "This event may be emitted multiple times, in which case the client may"]
             #[doc = "choose any given format."]
-            async fn shm_format(
+            fn shm_format(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_session_v2#{}.shm_format({})",
                     object.id,
                     format
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_uint(format).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event advertises the device buffers must be allocated on for"]
             #[doc = "dma-buf buffers."]
@@ -1506,22 +1455,18 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "render) is unspecified. Clients must not rely on the compositor sending"]
             #[doc = "a particular node type. Clients cannot check two devices for equality"]
             #[doc = "by comparing the dev_t value."]
-            async fn dmabuf_device(
+            fn dmabuf_device(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 device: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_session_v2#{}.dmabuf_device(array[{}])",
                     object.id,
                     device.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(device).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Provides the format that must be used for dma-buf buffers."]
             #[doc = ""]
@@ -1530,14 +1475,13 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = ""]
             #[doc = "This event may be emitted multiple times, in which case the client may"]
             #[doc = "choose any given format."]
-            async fn dmabuf_format(
+            fn dmabuf_format(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 format: u32,
                 modifiers: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_session_v2#{}.dmabuf_format({}, array[{}])",
                     object.id,
                     format,
@@ -1547,10 +1491,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_uint(format)
                     .put_array(modifiers)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is sent once when all buffer constraint events have been"]
             #[doc = "sent."]
@@ -1558,17 +1499,10 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "The compositor must always end a batch of buffer constraint events with"]
             #[doc = "this event, regardless of whether it sends the initial constraints or"]
             #[doc = "an update."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_screencopy_session_v2#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_screencopy_session_v2#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event indicates that the capture session has stopped and is no"]
             #[doc = "longer available. This can happen in a number of cases, e.g. when the"]
@@ -1576,17 +1510,10 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "capture, or if an unrecoverable runtime error has occurred."]
             #[doc = ""]
             #[doc = "The client should destroy the session after receiving this event."]
-            async fn stopped(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_screencopy_session_v2#{}.stopped()", object.id,);
+            fn stopped(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_screencopy_session_v2#{}.stopped()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
         }
     }
@@ -1782,13 +1709,12 @@ pub mod cosmic_screencopy_unstable_v2 {
             ) -> crate::server::Result<()>;
             #[doc = "This event is sent before the ready event and holds the transform of"]
             #[doc = "the source buffer."]
-            async fn transform(
+            fn transform(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 transform: super::super::super::core::wayland::wl_output::Transform,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_frame_v2#{}.transform({})",
                     object.id,
                     transform
@@ -1796,10 +1722,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(transform as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent before the ready event. It may be generated multiple"]
             #[doc = "times to describe a region."]
@@ -1809,16 +1732,15 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "have changed since the last ready event."]
             #[doc = ""]
             #[doc = "These coordinates originate in the upper left corner of the buffer."]
-            async fn damage(
+            fn damage(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_frame_v2#{}.damage({}, {}, {}, {})",
                     object.id,
                     x,
@@ -1832,10 +1754,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event indicates the time at which the frame is presented to the"]
             #[doc = "output in system monotonic time. This event is sent before the ready"]
@@ -1846,15 +1765,14 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "tv_sec which is a 64-bit value combined from tv_sec_hi and tv_sec_lo,"]
             #[doc = "and the additional fractional part in tv_nsec as nanoseconds. Hence,"]
             #[doc = "for valid timestamps tv_nsec must be in [0, 999999999]."]
-            async fn presentation_time(
+            fn presentation_time(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 tv_sec_hi: u32,
                 tv_sec_lo: u32,
                 tv_nsec: u32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_frame_v2#{}.presentation_time({}, {}, {})",
                     object.id,
                     tv_sec_hi,
@@ -1866,10 +1784,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_uint(tv_sec_lo)
                     .put_uint(tv_nsec)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "Called as soon as the frame is copied, indicating it is available"]
             #[doc = "for reading."]
@@ -1877,28 +1792,20 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "The buffer may be re-used by the client after this event."]
             #[doc = ""]
             #[doc = "After receiving this event, the client must destroy the object."]
-            async fn ready(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_screencopy_frame_v2#{}.ready()", object.id,);
+            fn ready(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_screencopy_frame_v2#{}.ready()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event indicates that the attempted frame copy has failed."]
             #[doc = ""]
             #[doc = "After receiving this event, the client must destroy the object."]
-            async fn failed(
+            fn failed(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 reason: FailureReason,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_frame_v2#{}.failed({})",
                     object.id,
                     reason
@@ -1906,10 +1813,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_uint(reason as u32)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
         }
     }
@@ -2012,38 +1916,24 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "The cursor enters the captured area when the cursor image intersects"]
             #[doc = "with the captured area. Note, this is different from e.g."]
             #[doc = "wl_pointer.enter."]
-            async fn enter(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn enter(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_cursor_session_v2#{}.enter()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "Sent when a cursor leaves the captured area. No \"position\" or \"hotspot\""]
             #[doc = "event is generated for the cursor until the cursor enters the captured"]
             #[doc = "area again."]
-            async fn leave(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn leave(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_cursor_session_v2#{}.leave()",
                     object.id,
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "Cursors outside the image source do not get captured and no event will"]
             #[doc = "be generated for them."]
@@ -2055,14 +1945,13 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = "The position coordinates are relative to the main buffer's upper left"]
             #[doc = "corner. The coordinates may be negative or greater than the main buffer"]
             #[doc = "size."]
-            async fn position(
+            fn position(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_cursor_session_v2#{}.position({}, {})",
                     object.id,
                     x,
@@ -2072,10 +1961,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_int(x)
                     .put_int(y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "The hotspot describes the offset between the cursor image and the"]
             #[doc = "position of the input device."]
@@ -2085,14 +1971,13 @@ pub mod cosmic_screencopy_unstable_v2 {
             #[doc = ""]
             #[doc = "Clients should not apply the hotspot immediately: the hotspot becomes"]
             #[doc = "effective when the next zcosmic_screencopy_frame_v2.ready event is received."]
-            async fn hotspot(
+            fn hotspot(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 x: i32,
                 y: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_screencopy_cursor_session_v2#{}.hotspot({}, {})",
                     object.id,
                     x,
@@ -2102,10 +1987,7 @@ pub mod cosmic_screencopy_unstable_v2 {
                     .put_int(x)
                     .put_int(y)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
         }
     }
@@ -2202,13 +2084,12 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = "All initial properties of the toplevel (title, app_id, states, etc.)"]
             #[doc = "will be sent immediately after this event via the corresponding"]
             #[doc = "events in zcosmic_toplevel_handle_v1."]
-            async fn toplevel(
+            fn toplevel(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 toplevel: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_info_v1#{}.toplevel({})",
                     object.id,
                     toplevel
@@ -2216,10 +2097,7 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(toplevel))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event indicates that the compositor is done sending events"]
             #[doc = "to the zcosmic_toplevel_info_v1. The server will destroy the"]
@@ -2228,17 +2106,10 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = ""]
             #[doc = "Note: This event is emitted immediately after calling `stop` for"]
             #[doc = "clients binding version 2 of this protocol for backwards compatibility."]
-            async fn finished(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_toplevel_info_v1#{}.finished()", object.id,);
+            fn finished(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_toplevel_info_v1#{}.finished()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is sent after all changes for currently active"]
             #[doc = "zcosmic_toplevel_handle_v1 have been sent."]
@@ -2246,17 +2117,10 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = "This allows changes to multiple zcosmic_toplevel_handle_v1 handles"]
             #[doc = "and their properties to be seen as atomic, even if they happen via"]
             #[doc = "multiple events."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_toplevel_info_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_toplevel_info_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
         }
     }
@@ -2347,17 +2211,10 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = "Note: This event will not be emitted for clients binding version 2"]
             #[doc = "of this protocol, as `ext_foreign_toplevel_handle_v1.closed` is"]
             #[doc = "equivalent."]
-            async fn closed(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_toplevel_handle_v1#{}.closed()", object.id,);
+            fn closed(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_toplevel_handle_v1#{}.closed()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
             #[doc = "This event is sent after all changes in the toplevel state have"]
             #[doc = "been sent."]
@@ -2370,30 +2227,18 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = "Note: This event will not be emitted for clients binding version 2"]
             #[doc = "of this protocol, as `ext_foreign_toplevel_handle_v1.done` is"]
             #[doc = "equivalent."]
-            async fn done(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-            ) -> crate::server::Result<()> {
-                tracing::debug!("-> zcosmic_toplevel_handle_v1#{}.done()", object.id,);
+            fn done(&self, object: &crate::server::Object) -> crate::wire::Message {
+                tracing::trace!("-> zcosmic_toplevel_handle_v1#{}.done()", object.id,);
                 let (payload, fds) = crate::wire::PayloadBuilder::new().build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 1u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 1u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the title of the toplevel changes."]
             #[doc = ""]
             #[doc = "Note: This event will not be emitted for clients binding version 2"]
             #[doc = "of this protocol, as `ext_foreign_toplevel_handle_v1.title` is"]
             #[doc = "equivalent."]
-            async fn title(
-                &self,
-                object: &crate::server::Object,
-                client: &mut crate::server::Client,
-                title: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            fn title(&self, object: &crate::server::Object, title: String) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.title(\"{}\")",
                     object.id,
                     title
@@ -2401,23 +2246,19 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(title))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 2u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 2u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the app_id of the toplevel changes."]
             #[doc = ""]
             #[doc = "Note: This event will not be emitted for clients binding version 2"]
             #[doc = "of this protocol, as `ext_foreign_toplevel_handle_v1.app_id` is"]
             #[doc = "equivalent."]
-            async fn app_id(
+            fn app_id(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 app_id: String,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.app_id(\"{}\")",
                     object.id,
                     app_id
@@ -2425,20 +2266,16 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_string(Some(app_id))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 3u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 3u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the toplevel becomes visible on the"]
             #[doc = "given output. A toplevel may be visible on multiple outputs."]
-            async fn output_enter(
+            fn output_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.output_enter({})",
                     object.id,
                     output
@@ -2446,21 +2283,17 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 4u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 4u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the toplevel is no longer visible"]
             #[doc = "on a given output. It is guaranteed that an output_enter event with"]
             #[doc = "the same output has been emitted before this event."]
-            async fn output_leave(
+            fn output_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.output_leave({})",
                     object.id,
                     output
@@ -2468,20 +2301,16 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(output))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 5u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 5u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the toplevel becomes visible on the"]
             #[doc = "given workspace. A toplevel may be visible on multiple workspaces."]
-            async fn workspace_enter(
+            fn workspace_enter(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.workspace_enter({})",
                     object.id,
                     workspace
@@ -2489,21 +2318,17 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 6u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 6u16, payload, fds)
             }
             #[doc = "This event is emitted whenever the toplevel is no longer visible"]
             #[doc = "on a given workspace. It is guaranteed that an workspace_enter event with"]
             #[doc = "the same workspace has been emitted before this event."]
-            async fn workspace_leave(
+            fn workspace_leave(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 workspace: crate::wire::ObjectId,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.workspace_leave({})",
                     object.id,
                     workspace
@@ -2511,30 +2336,23 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_object(Some(workspace))
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 7u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 7u16, payload, fds)
             }
             #[doc = "This event is emitted once on creation of the"]
             #[doc = "zcosmic_toplevel_handle_v1 and again whenever the state of the"]
             #[doc = "toplevel changes."]
-            async fn state(
+            fn state(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 state: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.state(array[{}])",
                     object.id,
                     state.len()
                 );
                 let (payload, fds) = crate::wire::PayloadBuilder::new().put_array(state).build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 8u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 8u16, payload, fds)
             }
             #[doc = "Emitted when the geometry of a toplevel (it's position and/or size)"]
             #[doc = "relative to the provided output has changed."]
@@ -2542,17 +2360,16 @@ pub mod cosmic_toplevel_info_unstable_v1 {
             #[doc = "This event is emitted once on creation of the"]
             #[doc = "zcosmic_toplevel_handle_v1 for every entered output and again"]
             #[doc = "whenever the geometry of the toplevel changes relative to any output."]
-            async fn geometry(
+            fn geometry(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 output: crate::wire::ObjectId,
                 x: i32,
                 y: i32,
                 width: i32,
                 height: i32,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_handle_v1#{}.geometry({}, {}, {}, {}, {})",
                     object.id,
                     output,
@@ -2568,10 +2385,7 @@ pub mod cosmic_toplevel_info_unstable_v1 {
                     .put_int(width)
                     .put_int(height)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 9u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 9u16, payload, fds)
             }
         }
     }
@@ -2991,13 +2805,12 @@ pub mod cosmic_toplevel_management_unstable_v1 {
             #[doc = ""]
             #[doc = "The capabilities are sent as an array of 32-bit unsigned integers in"]
             #[doc = "native endianness."]
-            async fn capabilities(
+            fn capabilities(
                 &self,
                 object: &crate::server::Object,
-                client: &mut crate::server::Client,
                 capabilities: Vec<u8>,
-            ) -> crate::server::Result<()> {
-                tracing::debug!(
+            ) -> crate::wire::Message {
+                tracing::trace!(
                     "-> zcosmic_toplevel_manager_v1#{}.capabilities(array[{}])",
                     object.id,
                     capabilities.len()
@@ -3005,10 +2818,7 @@ pub mod cosmic_toplevel_management_unstable_v1 {
                 let (payload, fds) = crate::wire::PayloadBuilder::new()
                     .put_array(capabilities)
                     .build();
-                client
-                    .send_message(crate::wire::Message::new(object.id, 0u16, payload, fds))
-                    .await
-                    .map_err(crate::server::error::Error::IoError)
+                crate::wire::Message::new(object.id, 0u16, payload, fds)
             }
         }
     }
