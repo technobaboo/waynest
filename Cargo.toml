@@ -37,8 +37,9 @@ cosmic = ["wlr"]
 frog = []
 ivi = []
 hyprland = []
+external = []
 
-# Internal features     
+# Internal features
 fuzz = ["dep:arbitrary"]
 
 [dependencies]
